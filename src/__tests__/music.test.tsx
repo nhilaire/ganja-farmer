@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { AppState } from 'react-native';
 
 import App from '../App';
-import { BackgroundMusic, MUSIC_VOLUME } from '../audio/music';
+import { BackgroundMusic, backgroundMusic, MUSIC_VOLUME } from '../audio/music';
 import { DEFAULT_SETTINGS } from '../storage/settings';
 
 function fakePlayer() {
@@ -68,5 +69,37 @@ describe('MUSIC toggle in SETUP (AC-42, AC-29)', () => {
     await fireEvent.press(await screen.findByText('SETUP'));
     expect(screen.getByTestId('setup-music').props.value).toBe(false);
     expect(screen.getByTestId('setup-sound').props.value).toBe(false);
+  });
+});
+
+describe('music in the running app (AC-42)', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+    await AsyncStorage.setItem('telemetry.consent.v1', 'denied');
+  });
+
+  it('starts at launch, pauses in the background, resumes, ignores SOUND and stops with MUSIC off', async () => {
+    const listeners: ((state: string) => void)[] = [];
+    const spy = jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+      listeners.push(listener as (state: string) => void);
+      return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;
+    });
+    const emit = async (state: string) => act(async () => listeners.forEach((l) => l(state)));
+
+    await render(<App splashMs={0} />);
+    await screen.findByText('PLAY');
+    expect(backgroundMusic.playing).toBe(true);
+
+    await emit('background');
+    expect(backgroundMusic.playing).toBe(false);
+    await emit('active');
+    expect(backgroundMusic.playing).toBe(true);
+
+    await fireEvent.press(screen.getByText('SETUP'));
+    await fireEvent(screen.getByTestId('setup-sound'), 'valueChange', false);
+    expect(backgroundMusic.playing).toBe(true);
+    await fireEvent(screen.getByTestId('setup-music'), 'valueChange', false);
+    expect(backgroundMusic.playing).toBe(false);
+    spy.mockRestore();
   });
 });

@@ -37,7 +37,8 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const feedback = useMemo(() => new FeedbackPolicy(), []);
-  const [foreground, setForeground] = useState(AppState.currentState === 'active' || AppState.currentState == null);
+  // In front unless explicitly in the background (Android may report "unknown" while starting).
+  const [foreground, setForeground] = useState(AppState.currentState !== 'background');
   const [result, setResult] = useState({ score: 0, kills: 0, level: 1, isHighScore: false });
   // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
   const engine = useMemo(() => {
@@ -64,7 +65,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
 
   // Background music (AC-42): on every screen once the stored settings are known, paused in the background.
   useEffect(() => {
-    const sub = AppState.addEventListener('change', (state) => setForeground(state === 'active'));
+    const sub = AppState.addEventListener('change', (state) => setForeground(state !== 'background'));
     return () => sub.remove();
   }, []);
 
