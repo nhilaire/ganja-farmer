@@ -38,6 +38,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 
 ### After the first phone test
 - [x] T-24 Multi-touch firing: keep firing while a finger is down, aim at the last finger placed (AC-40) - proof: unit
+- [x] T-25 Returning A-10s and crop dusters until destroyed, faster once the quota is reached (AC-41, D6) - proof: unit
 
 ## Notes
 

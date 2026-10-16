@@ -39,6 +39,7 @@ export function drawScene(canvas: SkCanvas, engine: GameEngine, overlay: SceneOv
   drawRasta(canvas, engine.aimAngle, engine.activeEffects, engine.weapon.id);
   for (const bullet of engine.bullets) drawBullet(canvas, bullet);
   for (const enemy of engine.airEnemies) {
+    if (enemy.away) continue; // D6: off screen, waiting to come back
     switch (enemy.type) {
       case 'helicopter':
       case 'blackhawk':

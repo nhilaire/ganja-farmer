@@ -3,9 +3,9 @@
 Phone install: PASS
 User acceptance: pending
 Date: 2026-10-16
-Commit: fd351f7
+Commit: e4cb484
 APK: ganja-farmer-0.1.0-arm64-v8a.apk (54 MB, arm64-v8a)
-SHA-256: 3ee79a5bf5d2fd48bb202fe84da3786c4626e6550d92c531e8f7cbf1b761ff98
+SHA-256: a2c9f19789151c487e3e275ba70c67dd8f5f2aeb2a758d5d224fc25060a1cb1d
 Signature: release signature valid
 Phone: Android 11 (API 30, arm64-v8a)
 Launch check: alive after 10 s, no fatal error
@@ -25,3 +25,7 @@ Launch check: alive after 10 s, no fatal error
   30/30 on the speaker, but the ringer is on silent/vibrate and expo-audio mutes playback in that case when
   `playsInSilentMode` is false. Fix: `playsInSilentMode: true` (media stream, Android convention); SOUND in SETUP
   stays the in-game mute.
+- 2026-10-16, fourth phone test: sound now works (phone on vibrate). Request: an A-10 that is not destroyed should
+  come back from time to time until destroyed, and regularly once the level is nearly over. Decided with the user:
+  A-10 and crop duster return after 5-10 s, at most 2 s once the quota is reached, keeping their HP (PRD D6, AC-41,
+  PLAN T-25).

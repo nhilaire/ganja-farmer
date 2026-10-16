@@ -23,12 +23,13 @@ describe('A-10 and bombs (AC-14)', () => {
     expect(a10.hasDropped).toBe(true);
   });
 
-  it('an A-10 crosses once and leaves', () => {
+  it('an A-10 that leaves the screen goes away and will come back (D6)', () => {
     const engine = setup(8);
     const a10 = engine.spawnEnemy('a10');
     Object.assign(a10, { x: W + 70 + 49, direction: 1, vx: 90, hasDropped: true });
     engine.update(0.05);
-    expect(engine.airEnemies).toHaveLength(0);
+    expect(engine.airEnemies).toEqual([a10]);
+    expect(a10.away).toBe(true);
   });
 
   it('a bomb falls at 120 px/s and destroys live plants within 50 px', () => {

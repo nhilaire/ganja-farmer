@@ -44,6 +44,8 @@ export interface AirEnemy extends Body {
   flashTimer: number;
   name?: string; // boss only
   immunePlants?: Set<number>; // crop duster only: plants whose shield blocked this pass (D4)
+  away?: boolean; // A-10 / crop duster off screen, waiting to come back (D6)
+  returnTimer?: number; // seconds until it comes back (D6)
 }
 
 export interface Paratrooper extends Body {

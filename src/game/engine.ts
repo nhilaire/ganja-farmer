@@ -3,7 +3,7 @@
 // It is stepped with `update(dt)`, draws randomness from an injected Rng and never reads the clock.
 // Deviations from the source (docs/PRD.md "Deliberate deviations"): D1 single plant state, D2 boss killed by
 // Jah Lightning counts as defeated, D3 speed decay changes movement, D4 shield blocks a crop duster for its pass,
-// D5 shields / trap / wall carry over between levels.
+// D5 shields / trap / wall carry over between levels, D6 A-10s and crop dusters come back until destroyed.
 import { AirType, bossForLevel, BURN_SECONDS, ENEMIES, PARATROOPER_FALL_SPEED, SOLDIER_FLEE_SPEED, SOLDIER_WALK_SPEED, SpawnType } from './enemies';
 import { jahDraw } from './jah';
 import { Layout, PLANT_COUNT, plantX } from './layout';
@@ -26,6 +26,9 @@ export const BABYLON_TRAP_CHARGES = 3;
 export const SPREAD_SHOT_ANGLE = 0.15;
 export const DUPPY_INTERVAL = 0.5;
 export const ROOTS_INTERVAL = 3;
+export const PLANE_RETURN_MIN = 5;
+export const PLANE_RETURN_MAX = 10;
+export const PLANE_RETURN_AFTER_QUOTA = 2;
 
 const overlaps = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }) =>
   a.x - a.width / 2 < b.x - b.width / 2 + b.width &&
@@ -472,6 +475,10 @@ export class GameEngine {
     const { W, groundY } = this.layout;
     for (const e of this.airEnemies) {
       if (!e.active) continue;
+      if (e.away) {
+        this.updateAwayPlane(e, dt);
+        continue;
+      }
       if (e.flashTimer > 0) e.flashTimer -= dt;
 
       if (e.type === 'ufo') e.vy = Math.sin((this.time * 1000) / 300) * 30;
@@ -570,8 +577,39 @@ export class GameEngine {
           }
         }
       } else if ((e.direction === 1 && e.x > W + e.width + 50) || (e.direction === -1 && e.x < -e.width - 50)) {
-        e.active = false;
+        if (e.type === 'a10' || e.type === 'cropduster') {
+          // D6: it leaves alive, so it will come back.
+          e.away = true;
+          e.returnTimer = randomRange(this.rng, PLANE_RETURN_MIN, PLANE_RETURN_MAX);
+        } else {
+          e.active = false;
+        }
       }
+    }
+  }
+
+  // D6: an away plane waits, faster once the quota is reached, then starts a new pass from a random side.
+  private updateAwayPlane(e: AirEnemy, dt: number): void {
+    if (this.waves.heliKills >= this.waves.config.requiredHeliKills) e.returnTimer = Math.min(e.returnTimer ?? 0, PLANE_RETURN_AFTER_QUOTA);
+    e.returnTimer = (e.returnTimer ?? 0) - dt;
+    if (e.returnTimer > 0) return;
+    const { W, H, skyTop, groundY } = this.layout;
+    const left = this.rng() > 0.5;
+    e.direction = left ? 1 : -1;
+    e.x = left ? -e.width : W + e.width;
+    e.vx = e.speed * e.direction;
+    e.passCount++;
+    e.dropTimer = 0;
+    e.away = false;
+    e.returnTimer = undefined;
+    if (e.type === 'a10') {
+      e.y = skyTop + randomRange(this.rng, 10, H * 0.15);
+      e.dropCount = randomInt(this.rng, 1, 2);
+      e.hasDropped = false;
+    } else {
+      e.y = groundY - randomRange(this.rng, 40, 80);
+      e.dropCount = 0;
+      e.immunePlants = new Set();
     }
   }
 
@@ -763,7 +801,7 @@ export class GameEngine {
     const { playerX, playerY } = this.layout;
     let target: { x: number; y: number } | null = null;
     let best = Infinity;
-    for (const t of [...this.airEnemies, ...this.paratroopers]) {
+    for (const t of [...this.airEnemies.filter((e) => !e.away), ...this.paratroopers]) {
       if (!t.active) continue;
       const d = Math.hypot(t.x - playerX, t.y - playerY);
       if (d < best) {
@@ -803,7 +841,7 @@ export class GameEngine {
     for (const b of this.bullets) {
       if (!b.active) continue;
       for (const e of this.airEnemies) {
-        if (!e.active || !overlaps(b, e)) continue;
+        if (!e.active || e.away || !overlaps(b, e)) continue;
         e.hp -= b.damage;
         e.flashTimer = 0.1;
         if (!b.penetrating) b.active = false;
@@ -860,7 +898,7 @@ export class GameEngine {
     this.emit({ type: 'powerUpActivated', id });
     switch (id) {
       case 'jah_lightning':
-        for (const e of this.airEnemies) if (e.active) this.killAirEnemy(e, e.score); // D2: a boss counts as defeated
+        for (const e of this.airEnemies) if (e.active && !e.away) this.killAirEnemy(e, e.score); // D2: a boss counts as defeated
         for (const p of this.paratroopers) {
           if (!p.active) continue;
           p.active = false;
@@ -884,7 +922,7 @@ export class GameEngine {
         this.zionWallHits = ZION_WALL_HITS;
         break;
       case 'one_drop':
-        for (const t of [...this.airEnemies, ...this.paratroopers]) if (t.active) t.hp = Math.max(1, Math.ceil(t.hp / 2));
+        for (const t of [...this.airEnemies.filter((e) => !e.away), ...this.paratroopers]) if (t.active) t.hp = Math.max(1, Math.ceil(t.hp / 2));
         break;
       default: {
         if (id === 'duppy_conqueror') this.duppyTimer = 0;

@@ -6,7 +6,7 @@ Final app name: Ganja Farmer
 Android package: io.github.nhilaire.ganjafarmer
 Version target: 0.1.0
 Player language: en-US (`factory-app.json` `language`)
-Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40 and APK size after the phone test)
+Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40, AC-41 (D6) and APK size after the phone tests)
 
 > Written in English. **Player-facing strings are in English too** (user's decision, an exception to the factory's
 > French default); they are quoted in the "Player-facing copy" section.
@@ -25,7 +25,7 @@ Pitch: "Defend your field, Rasta!"
 **Reference rule:** this is a port, not a redesign. Every rule and number below comes from the source code
 (`src/constants/*`, `src/engine/*`, `src/components/Game.tsx` of the source project), which wins over the source
 docs whenever they differ. The port adds the factory layer (consent, opt-in telemetry, settings, sound effects,
-auto-pause, tests). The only rule changes are the user-approved fixes listed in "Deliberate deviations from the
+auto-pause, tests). The only rule changes are the user-approved changes listed in "Deliberate deviations from the
 source" at the end of "Rules and scoring".
 
 ## Target players
@@ -186,11 +186,11 @@ Level multipliers: `speedMult = 1 + 0.10 (L - 1)`, `hpMult = 1 + 0.05 (L - 1)`, 
   - It can be shot in the air and on the ground (same HP, 100 points).
 - **Burning plant:** `burnProgress += dt / 3` (3 s; scaled by time effects). At 1 the plant is destroyed and the
   soldier targeting it is credited.
-- **A-10:** enters at height `HUD + uniform(10, 0.15 H)` and crosses once. Between 0.10 W and 0.90 W it drops
+- **A-10:** enters at height `HUD + uniform(10, 0.15 H)` and crosses, then comes back until destroyed (D6). Between 0.10 W and 0.90 W it drops
   randint(1, 2) bombs, one every 0.4 s, at `x + uniform(-15, 15)`.
 - **Bomb:** falls at 120 px/s and can be shot (1 hit, 300 points). On reaching `GROUND_Y` it explodes and destroys
   every live plant within 50 px horizontally. A shielded plant loses its shield instead.
-- **Crop duster:** flies low (`GROUND_Y - uniform(40, 80)`) and crosses once.
+- **Crop duster:** flies low (`GROUND_Y - uniform(40, 80)`) and crosses, then comes back until destroyed (D6).
   - **Attack:** checked every frame, and only while its height is below `GROUND_Y - 60` (`y > GROUND_Y - 60`): one
     spawned higher never attacks. It sets on fire every non-burning live plant within 20 px horizontally, up to 5
     attacks per pass.
@@ -343,6 +343,12 @@ Level multipliers: `speedMult = 1 + 0.10 (L - 1)`, `hpMult = 1 + 0.05 (L - 1)`, 
   on fire on the next frame anyway.
 - **D5 - lasting defences:** shields, Babylon Trap charges and Zion Wall carry over between levels until used. In
   the source they were lost at each level.
+- **D6 - returning planes** (asked at the phone test): an A-10 or a crop duster that leaves the screen alive is not
+  removed. It stays "away" (not drawn, not hittable, still counting as a remaining enemy, so the level cannot end)
+  and comes back after `uniform(5, 10)` s, or after at most 2 s once the helicopter quota is reached. It re-enters from
+  a random side at a new height (same spawn rule), keeps its HP, and starts a new pass: an A-10 reloads randint(1, 2)
+  bombs, a crop duster gets its 5 attacks back (and a new D4 pass). Jah Lightning and One Drop only affect planes on
+  screen. UFOs still cross once.
 
 ## Look, sound and feel
 
@@ -463,6 +469,9 @@ phone, `[manual]` human judgement (kept rare).
   power-up orb or a bomb.
 - AC-40 [unit] Given one finger held down while firing, when a second finger touches the screen and the first one is
   lifted, then firing continues and aims at the second finger; firing stops only when no finger is left.
+- AC-41 [unit] Given an A-10 or a crop duster that leaves the screen alive, then it is not drawn nor hittable while
+  away, the level does not complete, and it comes back after 5-10 s (at most 2 s once the quota is reached) from a
+  random side with the same HP and a new pass (A-10: 1-2 new bombs; crop duster: 5 new attacks) (D6).
 - AC-15 [unit] Given kills, then each enemy adds its score, air kills by bullets within 2.0 s build a combo with
   multiplier `1 + 0.5 (n - 1)` and `floor` rounding, and paratroopers, bombs and Jah Lightning kills are not
   multiplied.
@@ -573,7 +582,7 @@ English, casual tone with rasta winks. Kept from the source unless marked new. A
 - Online leaderboard, accounts, cloud save, multiplayer.
 - Music (sound effects only).
 - Web and iOS builds; Play Store publication.
-- New weapons, enemies, power-ups or rule changes beyond the source code and deviations D1-D5; rebalancing.
+- New weapons, enemies, power-ups or rule changes beyond the source code and deviations D1-D6; rebalancing.
 - Rocket area damage (explosions stay visual, as in the source).
 - Boss shield phases (defined in the source constants but unused by its engine).
 - Resuming an abandoned game after leaving to the menu or killing the app.
