@@ -12,7 +12,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 ### Engine (pure TypeScript, `src/game/`)
 - [x] T-03 Engine core: plants, firing, bullets, collisions (laser, orb and bomb stop rules), game-over once (AC-09, AC-39, AC-21) - proof: unit
 - [x] T-04 Helicopters and Black Hawks: spawn, drops, global cap, wrap, reload, applied speed decay D3 (AC-12) - proof: unit
-- [ ] T-05 Paratroopers and soldiers: fall with drift, landing, targeting, burning, fleeing (AC-13) - proof: unit
+- [x] T-05 Paratroopers and soldiers: fall with drift, landing, targeting, burning, fleeing (AC-13) - proof: unit
 - [ ] T-06 A-10 and bombs, crop duster (D4), UFO, plant shields (AC-14) - proof: unit
 - [ ] T-07 Wave manager: quota, respawn, scripted waves with helicopter blocking, level completion and its edge cases (AC-11, AC-16) - proof: unit
 - [ ] T-08 Bosses: tiers, attacks, wrap without reload, defeat by bullet or Jah Lightning D2 (AC-18) - proof: unit
