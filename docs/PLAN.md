@@ -33,7 +33,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 ### Factory layer and polish
 - [x] T-20 Telemetry calls for the 6 PRD events, cause tracking, consent gating (AC-03, AC-04, AC-05) - proof: unit
 - [x] T-21 Generated sound effects (no third-party audio) with expo-audio, haptics, both behind settings (AC-30, AC-37) - proof: unit
-- [ ] T-22 Maestro flows: consent, home, game HUD, cheat skip and transition, game over and high score, relaunch persistence, pause, background, setup, about, idle scores, telemetry (AC-01, AC-02, AC-05, AC-06, AC-07, AC-08, AC-22, AC-23, AC-25, AC-26, AC-27, AC-29, AC-32, AC-33) - proof: e2e
+- [x] T-22 Maestro flows: consent, home, game HUD, cheat skip and transition, game over and high score, relaunch persistence, pause, background, setup, about, idle scores, telemetry (AC-01, AC-02, AC-05, AC-06, AC-07, AC-08, AC-22, AC-23, AC-25, AC-26, AC-27, AC-29, AC-32, AC-33) - proof: e2e
 - [ ] T-23 Device criteria prepared for verify and release: icon/name/landscape, cold start, no crash, feel check by the user (AC-34, AC-35, AC-36, AC-37) - proof: device
 
 ## Notes

@@ -27,10 +27,10 @@ tags:
     timeout: 480000
 - assertVisible: "Score: 0001000"
 - assertVisible: "Level: 2"
-# AC-23: name entry on a top-10 score.
-- extendedWaitUntil:
-    visible: "NEW HIGH SCORE!"
-    timeout: 6000
+# AC-23: name entry on a top-10 score, shown 3 s after the game over.
+# Plain pause: Maestro waits fail at once right after this screen change.
+- evalScript: ${(function () { var t = Date.now(); while (Date.now() - t < 4000) {} })()}
+- assertVisible: "NEW HIGH SCORE!"
 - takeScreenshot: 08-game-over
 - tapOn:
     id: "gameover-name"
@@ -54,9 +54,9 @@ tags:
       id: "home-scores"
     timeout: 15000
 # AC-33: after 30 s without a touch, the table shows by itself; a tap returns home.
-- extendedWaitUntil:
-    visible: "HIGH SCORES"
-    timeout: 40000
+# Plain pause without touching the screen (a touch would reset the idle timer).
+- evalScript: ${(function () { var t = Date.now(); while (Date.now() - t < 32000) {} })()}
+- assertVisible: "HIGH SCORES"
 - assertVisible: "IRIE"
 - takeScreenshot: 10-idle-scores
 - tapOn: "HIGH SCORES"

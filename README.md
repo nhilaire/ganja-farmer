@@ -1,6 +1,8 @@
 # Ganja Farmer
 
-A small Android game made with React Native. The game is in French.
+A landscape arcade shooter for Android, made with React Native, Expo and Skia: defend your field of 26 plants
+from helicopters, paratroopers, bombers, UFOs and bosses. A tribute to the 1998 freeware *Ganja Farmer*, not
+affiliated with its creators. The game is in English and intended for adults.
 
 ## Play
 
@@ -11,7 +13,9 @@ Android phone (allow installation from unknown sources).
 
 - No account, no ads, no personal data.
 - Anonymous usage statistics and crash reports (Firebase) are sent **only if you accept** on first launch.
-  You can change your choice at any time in *Paramètres*.
+  You can change your choice at any time in *SETUP*.
+- Collected events (only after consent): game start, level completed, boss defeated, game over, game quit, settings
+  changes, with numbers and short codes only (level, score, duration, cause). High-score names stay on the phone.
 
 ## Build from source
 
@@ -20,6 +24,7 @@ Requirements: Node.js 20+, JDK 17, Android SDK.
 ```bash
 npm install
 npm test
+npm run sfx   # regenerates the synthesised sound effects in assets/sfx
 ```
 
 Firebase configuration is not part of this repository. To build with telemetry, create your own Firebase project
