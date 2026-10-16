@@ -8,9 +8,9 @@ affiliated with its creators. The game is in English and intended for adults.
 
 <!-- factory:screenshots:start -->
 <p>
-  <img src="docs/screenshots/readme-1-home.png" width="240" alt="home">
-  <img src="docs/screenshots/readme-2-gameplay.png" width="240" alt="gameplay">
-  <img src="docs/screenshots/readme-3-game-over.png" width="240" alt="game over">
+  <img src="docs/screenshots/readme-1-home.png" width="480" alt="home">
+  <img src="docs/screenshots/readme-2-gameplay.png" width="480" alt="gameplay">
+  <img src="docs/screenshots/readme-3-level-transition.png" width="480" alt="level transition">
 </p>
 <!-- factory:screenshots:end -->
 
