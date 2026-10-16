@@ -18,7 +18,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-08 Bosses: tiers, attacks, wrap without reload, defeat by bullet or Jah Lightning D2 (AC-18) - proof: unit
 - [x] T-09 Scoring and combo (AC-15) - proof: unit
 - [x] T-10 Power-ups: spawn timing, orbs, the 12 effects, carry-over of defences D5 (AC-19, AC-20) - proof: unit
-- [ ] T-11 Game session: level progression, bonus, Jah draw, single plant state D1, pause freeze, cheats, play time (AC-16, AC-17, AC-38, AC-28, AC-31) - proof: unit
+- [x] T-11 Game session: level progression, bonus, Jah draw, single plant state D1, pause freeze, cheats, play time (AC-16, AC-17, AC-38, AC-28, AC-31) - proof: unit
 
 ### Screens
 - [ ] T-12 Skia renderer port and Game screen: canvas, touch aim/fire, HUD, pause overlay, messages (AC-08, AC-26) - proof: unit
