@@ -26,7 +26,7 @@ function player(name: SoundName): AudioPlayer {
   let p = players.get(name);
   if (!p) {
     p = createAudioPlayer(SOURCES[name]);
-    p.volume = name.startsWith('shot_') ? 0.35 : 0.8;
+    p.volume = name.startsWith('shot_') ? 0.6 : 1;
     players.set(name, p);
   }
   return p;

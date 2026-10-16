@@ -38,15 +38,18 @@ function square(freq, t) {
 
 const sounds = {
   // Pistol, machine gun, gatling: a short dry crack.
-  shot_light: () => lowpass(render(0.07, (t, p) => noise() * (1 - p) ** 3), 0.6),
+  shot_light: () => render(0.08, (t, p) => (noise() * 0.8 + square(900 - 500 * p, t) * 0.4) * (1 - p) ** 2),
   // 20mm AA gun: a heavier thump with a low tone.
   shot_heavy: () => render(0.14, (t, p) => (noise() * 0.6 + tone(110 - 60 * p, t) * 0.7) * (1 - p) ** 2),
   // Rocket launcher: a rising whoosh.
   shot_rocket: () => lowpass(render(0.3, (t, p) => noise() * Math.sin(Math.PI * p) * 0.9), 0.35),
   // Laser cannon: a falling zap.
   shot_laser: () => render(0.16, (t, p) => square(1400 - 1100 * p, t) * (1 - p) ** 1.5 * 0.7),
-  // Explosion: low rumbling noise with a long decay.
-  explosion: () => lowpass(render(0.6, (t, p) => noise() * (1 - p) ** 2.5), 0.12),
+  // Explosion: a bright crack over a rumbling noise with a long decay (phone speakers do not reproduce deep bass).
+  explosion: () => {
+    const rumble = lowpass(render(0.6, (t, p) => noise() * (1 - p) ** 2.5), 0.3);
+    return rumble.map((v, i) => v + noise() * Math.max(0, 1 - i / (RATE * 0.08)) * 0.6);
+  },
   // A plant catches fire: a crackle.
   fire: () => render(0.35, (t, p) => (noise() > 0.84 ? noise() : noise() * 0.15) * (1 - p) * 0.8),
   // Power-up: a quick rising arpeggio.
@@ -68,6 +71,12 @@ const sounds = {
     return square([392, 330, 262][step], t) * (1 - (p * 3 - step) * 0.5) * 0.4 * (1 - p * 0.5);
   }),
 };
+
+// Every sound peaks at -0.5 dBFS so it stays audible on a phone speaker; playback volume does the mixing.
+function normalize(samples, peak = 0.95) {
+  const max = samples.reduce((m, v) => Math.max(m, Math.abs(v)), 0) || 1;
+  return samples.map((v) => (v / max) * peak);
+}
 
 function toWav(samples) {
   const data = Buffer.alloc(samples.length * 2);
@@ -93,6 +102,6 @@ fs.mkdirSync(OUT, { recursive: true });
 for (const [name, make] of Object.entries(sounds)) {
   seed = 12345;
   const file = path.join(OUT, `${name}.wav`);
-  fs.writeFileSync(file, toWav(make()));
+  fs.writeFileSync(file, toWav(normalize(make())));
   console.log(`${name}.wav ${fs.statSync(file).size} bytes`);
 }

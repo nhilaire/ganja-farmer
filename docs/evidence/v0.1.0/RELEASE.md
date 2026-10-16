@@ -3,9 +3,9 @@
 Phone install: PASS
 User acceptance: pending
 Date: 2026-10-16
-Commit: f64c49b
+Commit: afeee55
 APK: ganja-farmer-0.1.0-arm64-v8a.apk (54 MB, arm64-v8a)
-SHA-256: fea34463e28d1b0654637f3ac6a017f6dbf6c64a8df041d42f6582f06b564cb6
+SHA-256: 943ff7ed7a334f220a2042c57b1209e870ca0fd4b08f28cb0291724243d77951
 Signature: release signature valid
 Phone: Android 11 (API 30, arm64-v8a)
 Launch check: alive after 10 s, no fatal error
@@ -17,3 +17,7 @@ Launch check: alive after 10 s, no fatal error
   least one finger is down and aims at the last finger placed (PRD amended, AC-40, PLAN T-24).
 - APK size 54 MB (arm64) is above the 40 MB target: accepted by the user, PRD target changed to < 60 MB
   (Skia + Reanimated native code).
+- 2026-10-16, second phone test: multi-touch firing fixed; no sound heard. On the emulator the sounds do play
+  (expo-audio PLAYING, frames delivered) but they were far too quiet for a phone speaker (pistol shot about 5% of
+  full scale, explosion mostly bass). Fix: every generated sound normalized to a 0.95 peak, brighter shot and
+  explosion, playback volume 0.6 for shots and 1.0 for the rest.
