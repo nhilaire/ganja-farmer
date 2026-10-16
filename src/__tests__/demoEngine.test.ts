@@ -1,4 +1,4 @@
-import { ROUND_SECONDS, durationSeconds, initialState, reduce, remainingSeconds } from '../game/engine';
+import { ROUND_SECONDS, durationSeconds, initialState, reduce, remainingSeconds } from '../game/demoEngine';
 
 const T0 = 1_000_000;
 
