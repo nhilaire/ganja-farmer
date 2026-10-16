@@ -72,6 +72,7 @@ Mark assumptions the user accepted as `(default accepted)`.
 
 - **Q:** What does the SETUP screen contain (currently "Coming soon")?
   **A:** Sound effects on/off, statistics consent on/off, reset high scores (with confirmation). (default accepted)
+  A Vibration on/off toggle was added during the PRD phase (vibrations exist in the source code).
 - **Q:** What happens when the player leaves the app mid-game?
   **A:** Automatic pause when the app goes to background; a PAUSED screen with RESUME / MENU on return; a pause
   button in the HUD. (default accepted)
@@ -98,8 +99,20 @@ Mark assumptions the user accepted as `(default accepted)`.
 - **Player-facing language is English** (user's explicit choice), an exception to the factory default of French
   strings: all screens, including consent, About and settings, are in English. `factory-app.json` language must
   reflect it.
-- **Port, not redesign:** game rules, numbers and content come from the source project docs (`GAME_RULES.md` is the
-  reference for numbers); the engine is ported to pure TypeScript with tests.
+- **Port, not redesign:** game rules, numbers and content come from the source project. When the source **code**
+  (`src/constants/*`, `src/engine/*`, `src/components/Game.tsx`) and the source docs disagree, **the code is the
+  reference** (user's choice during the PRD phase: it is the game the user actually plays). The engine is ported to
+  pure TypeScript with tests.
+- **Hidden cheats kept** (user's choice): triple tap within 800 ms in the top-left corner completes the level,
+  in the top-right corner restores 2 plants.
+- **Source bugs fixed** (user's choice during the PRD review):
+  - one plant state (engine and store drifted apart);
+  - a boss killed by Jah Lightning counts as defeated;
+  - the helicopter speed decay on wrap is really applied;
+  - a shield blocks a crop duster for its whole pass;
+  - shields, Babylon Trap and Zion Wall carry over between levels until used (in the source they were lost).
+- **Vibrations kept** (plant set on fire, boss defeated, game over) with a Vibration on/off toggle in SETUP,
+  on by default (user's choice).
 - **Assets reused** from the source: icon, adaptive icon layers (foreground, background, monochrome, background colour
   `#228B22`), landscape splash image with logo (custom 2 s splash after the native one). All AI-generated for the user.
 - **Landscape only, fullscreen** (immersive mode, as the source `withFullscreen` plugin).
