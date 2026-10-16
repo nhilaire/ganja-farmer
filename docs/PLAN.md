@@ -6,7 +6,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 ## Tasks
 
 ### Foundation
-- [ ] T-01 English player copy: `src/i18n/en.ts` replaces `fr.ts`, app CLAUDE.md language rule, template screens and App test in English (AC-01, AC-02) - proof: unit
+- [x] T-01 English player copy: `src/i18n/en.ts` replaces `fr.ts`, app CLAUDE.md language rule, template screens and App test in English (AC-01, AC-02) - proof: unit
 - [ ] T-02 Seeded RNG, screen layout from (W, H), constants: weapons, enemies, levels, bosses, power-ups ported from the source (AC-10, AC-11) - proof: unit
 
 ### Engine (pure TypeScript, `src/game/`)

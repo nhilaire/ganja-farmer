@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { APP_NAME, APP_VERSION } from '../config/app';
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
 
-// « À propos »: why this game exists (story from the discovery brief), a word from the author (a passionate
+// why this game exists (story from the discovery brief), a word from the author (a passionate
 // developer, free time, bugs are possible), the player's data, the version.
 function Section({ title, paragraphs }: { title: string; paragraphs: readonly string[] }) {
   return (
@@ -35,16 +35,16 @@ export function AboutScreen({ onBack }: { onBack: () => void }) {
   return (
     <Screen testID="about-screen">
       <Text style={styles.title} accessibilityRole="header">
-        {fr.about.title}
+        {en.about.title}
       </Text>
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={styles.name}>{APP_NAME}</Text>
-        <Section title={fr.about.storyTitle} paragraphs={fr.about.story} />
-        <Section title={fr.about.authorTitle} paragraphs={fr.about.author} />
-        <Section title={fr.about.dataTitle} paragraphs={fr.about.data} />
-        <Text style={styles.version}>{fr.about.version(APP_VERSION)}</Text>
+        <Section title={en.about.whyTitle} paragraphs={en.about.story} />
+        <Section title={en.about.versionTitle} paragraphs={en.about.thisVersion} />
+        <Section title={en.about.dataTitle} paragraphs={en.about.data} />
+        <Text style={styles.version}>{en.about.version(APP_VERSION)}</Text>
       </ScrollView>
-      <Button label={fr.about.back} onPress={onBack} variant="secondary" testID="about-back" />
+      <Button label={en.about.back} onPress={onBack} variant="secondary" testID="about-back" />
     </Screen>
   );
 }

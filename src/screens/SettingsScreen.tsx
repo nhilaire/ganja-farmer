@@ -1,6 +1,6 @@
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
@@ -11,23 +11,23 @@ export function SettingsScreen({ telemetryEnabled, onToggleTelemetry, onBack }: 
   return (
     <Screen testID="settings-screen">
       <Text style={styles.title} accessibilityRole="header">
-        {fr.settings.title}
+        {en.setup.title}
       </Text>
       <View style={styles.row}>
         <View style={styles.rowText}>
-          <Text style={styles.label}>{fr.settings.telemetry}</Text>
-          <Text style={styles.help}>{fr.settings.telemetryHelp}</Text>
+          <Text style={styles.label}>{en.setup.stats}</Text>
+          <Text style={styles.help}>{en.setup.statsHelp}</Text>
         </View>
         <Switch
           value={telemetryEnabled}
           onValueChange={onToggleTelemetry}
-          accessibilityLabel={fr.settings.telemetry}
+          accessibilityLabel={en.setup.stats}
           testID="settings-telemetry"
           trackColor={{ true: colors.accent, false: colors.surface }}
         />
       </View>
       <View style={styles.spacer} />
-      <Button label={fr.settings.back} onPress={onBack} variant="secondary" testID="settings-back" />
+      <Button label={en.setup.back} onPress={onBack} variant="secondary" testID="settings-back" />
     </Screen>
   );
 }

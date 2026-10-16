@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
@@ -11,13 +11,13 @@ export function ConsentScreen({ onDecision }: { onDecision: (granted: boolean) =
     <Screen testID="consent-screen">
       <View style={styles.content}>
         <Text style={styles.title} accessibilityRole="header">
-          {fr.consent.title}
+          {en.consent.title}
         </Text>
-        <Text style={styles.body}>{fr.consent.body}</Text>
-        <Text style={styles.footnote}>{fr.consent.footnote}</Text>
+        <Text style={styles.body}>{en.consent.body}</Text>
+        <Text style={styles.footnote}>{en.consent.footnote}</Text>
       </View>
-      <Button label={fr.consent.accept} onPress={() => onDecision(true)} testID="consent-accept" />
-      <Button label={fr.consent.refuse} onPress={() => onDecision(false)} variant="secondary" testID="consent-refuse" />
+      <Button label={en.consent.accept} onPress={() => onDecision(true)} testID="consent-accept" />
+      <Button label={en.consent.refuse} onPress={() => onDecision(false)} variant="secondary" testID="consent-refuse" />
     </Screen>
   );
 }

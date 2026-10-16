@@ -2,7 +2,7 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { durationSeconds, initialState, reduce, remainingSeconds } from '../game/engine';
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { track } from '../telemetry/telemetry';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
@@ -47,12 +47,12 @@ export function GameScreen({ onExit, onGameOver }: Props) {
       <Screen testID="game-over-screen">
         <View style={styles.center}>
           <Text style={styles.title} accessibilityRole="header">
-            {fr.game.over}
+            {en.demo.over}
           </Text>
-          <Text style={styles.score}>{fr.game.finalScore(state.score)}</Text>
+          <Text style={styles.score}>{en.demo.finalScore(state.score)}</Text>
         </View>
-        <Button label={fr.game.playAgain} onPress={start} testID="game-play-again" />
-        <Button label={fr.game.home} onPress={onExit} variant="secondary" testID="game-home" />
+        <Button label={en.demo.playAgain} onPress={start} testID="game-play-again" />
+        <Button label={en.demo.home} onPress={onExit} variant="secondary" testID="game-home" />
       </Screen>
     );
   }
@@ -60,17 +60,17 @@ export function GameScreen({ onExit, onGameOver }: Props) {
   return (
     <Screen testID="game-screen">
       <View style={styles.hud}>
-        <Text style={styles.hudText}>{fr.game.score(state.score)}</Text>
-        <Text style={styles.hudText}>{fr.game.timeLeft(remainingSeconds(state, now))}</Text>
+        <Text style={styles.hudText}>{en.demo.score(state.score)}</Text>
+        <Text style={styles.hudText}>{en.demo.timeLeft(remainingSeconds(state, now))}</Text>
       </View>
       <Pressable
         testID="game-tap-zone"
         accessibilityRole="button"
-        accessibilityLabel={fr.game.tap}
+        accessibilityLabel={en.demo.tap}
         onPress={() => dispatch({ type: 'tap', now: Date.now() })}
         style={({ pressed }) => [styles.tapZone, pressed && styles.tapZonePressed]}
       >
-        <Text style={styles.tapText}>{fr.game.tap}</Text>
+        <Text style={styles.tapText}>{en.demo.tap}</Text>
       </Pressable>
     </Screen>
   );

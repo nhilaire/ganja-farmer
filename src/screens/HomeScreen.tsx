@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { APP_NAME } from '../config/app';
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
@@ -15,11 +15,10 @@ export function HomeScreen({ bestScore, onPlay, onSettings, onAbout }: Props) {
         <Text style={styles.title} accessibilityRole="header">
           {APP_NAME}
         </Text>
-        {bestScore > 0 && <Text style={styles.best}>{fr.home.bestScore(bestScore)}</Text>}
       </View>
-      <Button label={fr.home.play} onPress={onPlay} testID="home-play" />
-      <Button label={fr.home.settings} onPress={onSettings} variant="secondary" testID="home-settings" />
-      <Button label={fr.home.about} onPress={onAbout} variant="secondary" testID="home-about" />
+      <Button label={en.home.play} onPress={onPlay} testID="home-play" />
+      <Button label={en.home.setup} onPress={onSettings} variant="secondary" testID="home-settings" />
+      <Button label={en.home.about} onPress={onAbout} variant="secondary" testID="home-about" />
     </Screen>
   );
 }

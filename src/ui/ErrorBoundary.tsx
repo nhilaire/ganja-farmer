@@ -1,7 +1,7 @@
 import { Component, ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { fr } from '../i18n/fr';
+import { en } from '../i18n/en';
 import { reportError } from '../telemetry/telemetry';
 import { Button } from './Button';
 import { colors, font, spacing } from './theme';
@@ -24,9 +24,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
     if (!this.state.failed) return this.props.children;
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{fr.errors.title}</Text>
-        <Text style={styles.body}>{fr.errors.body}</Text>
-        <Button label={fr.errors.retry} onPress={() => this.setState({ failed: false })} />
+        <Text style={styles.title}>{en.errors.title}</Text>
+        <Text style={styles.body}>{en.errors.body}</Text>
+        <Button label={en.errors.retry} onPress={() => this.setState({ failed: false })} />
       </View>
     );
   }
