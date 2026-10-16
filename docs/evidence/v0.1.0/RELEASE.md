@@ -3,9 +3,9 @@
 Phone install: PASS
 User acceptance: confirmed (2026-10-16)
 Date: 2026-10-16
-Commit: 2a4a544
+Commit: 67220ab
 APK: ganja-farmer-0.1.0-arm64-v8a.apk (56 MB, arm64-v8a)
-SHA-256: e41a170b243a141386fae4b93bf2501c91ca023f8010cef7b7ba684109890e20
+SHA-256: ed35372125841873cfcb19901bd817d93431d9422a55a7b98b12fe62be1f6e34
 Signature: release signature valid
 Phone: Android 11 (API 30, arm64-v8a)
 Launch check: alive after 10 s, no fatal error
@@ -37,3 +37,5 @@ Launch check: alive after 10 s, no fatal error
   link in its tags, and the track was made on the Suno free plan (not redistributable). Decided with the user: the
   music stays local (git-ignored `assets/music/local/`, bundled only when present), the file is removed from the
   whole git history before the first push, and v0.1.0 is re-verified and re-accepted.
+- 2026-10-16, sixth phone test (build 67220ab, arm64 56 MB, music bundled from the local file): the user wants the
+  music on their own phone even though it cannot be on GitHub; music, icon and feel checked: accepted.
