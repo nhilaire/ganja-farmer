@@ -38,7 +38,7 @@ export function GameScreen({ onExit, onGameOver }: Props) {
   useEffect(() => {
     if (state.status !== 'over' || reported.current) return;
     reported.current = true;
-    track('game_over', { level: state.level, score: state.score, duration_s: durationSeconds(state) });
+    track('game_over', { level: state.level, score: state.score, duration_s: durationSeconds(state), cause: 'soldier' }); // factory demo screen, replaced by the port
     onGameOver(state.score);
   }, [state, onGameOver]);
 

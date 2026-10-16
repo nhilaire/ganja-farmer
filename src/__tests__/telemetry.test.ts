@@ -27,8 +27,8 @@ describe('telemetry consent', () => {
 
   it('sends typed events after consent, never ad storage', async () => {
     await applyConsent(true);
-    track('game_over', { level: 1, score: 12, duration_s: 10 });
-    expect(logEvent).toHaveBeenCalledWith(expect.anything(), 'game_over', { level: 1, score: 12, duration_s: 10 });
+    track('game_over', { level: 1, score: 12, duration_s: 10, cause: 'bomb' });
+    expect(logEvent).toHaveBeenCalledWith(expect.anything(), 'game_over', { level: 1, score: 12, duration_s: 10, cause: 'bomb' });
     expect(setConsent).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ analytics_storage: true, ad_storage: false }));
   });
 });

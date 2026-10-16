@@ -1,9 +1,17 @@
 // Typed catalog of the only telemetry events this app may send (must match docs/PRD.md "Telemetry events").
 // Params are numbers or short lowercase enums. Never identifiers, names, free text or locations.
 
+export type GameOverCause = 'soldier' | 'bomb' | 'cropduster' | 'ufo';
+export type SettingName = 'sound' | 'vibration' | 'telemetry' | 'reset_scores';
+export type SettingValue = 'on' | 'off' | 'done';
+
 export type TelemetryEvents = {
   game_start: { level: number };
-  game_over: { level: number; score: number; duration_s: number };
+  level_complete: { level: number; score: number; duration_s: number; plants_alive: number };
+  boss_defeated: { level: number };
+  game_over: { level: number; score: number; duration_s: number; cause: GameOverCause };
+  game_quit: { level: number; duration_s: number };
+  settings_change: { setting: SettingName; value: SettingValue };
 };
 
 export type EventName = keyof TelemetryEvents;
