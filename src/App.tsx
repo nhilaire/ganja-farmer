@@ -11,9 +11,10 @@ import { GameOverScreen } from './screens/GameOverScreen';
 import { GameScreen } from './screens/GameScreen';
 import { HighScoresScreen } from './screens/HighScoresScreen';
 import { HomeScreen } from './screens/HomeScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
+import { SetupScreen } from './screens/SetupScreen';
 import { SPLASH_MS, SplashScreen } from './screens/SplashScreen';
-import { loadHighScores, saveHighScore } from './storage/highScores';
+import { clearHighScores, loadHighScores, saveHighScore } from './storage/highScores';
+import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from './storage/settings';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { applyConsent } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
@@ -29,6 +30,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const [consent, setConsentState] = useState<Consent | 'loading'>('loading');
   const [route, setRoute] = useState<Route>('home');
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [result, setResult] = useState({ score: 0, kills: 0, level: 1, isHighScore: false });
   // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
   const engine = useMemo(() => {
@@ -39,10 +41,11 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [storedConsent, storedScores] = await Promise.all([loadConsent(), loadHighScores()]);
+      const [storedConsent, storedScores, storedSettings] = await Promise.all([loadConsent(), loadHighScores(), loadSettings()]);
       if (storedConsent !== 'unknown') await applyConsent(storedConsent === 'granted');
       if (alive) {
         setScores(storedScores);
+        setSettings(storedSettings);
         setConsentState(storedConsent);
         NativeSplash.hideAsync().catch(() => {});
       }
@@ -65,6 +68,19 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   }, [engine]);
 
   const home = useCallback(() => setRoute('home'), []);
+
+  const changeSettings = useCallback((patch: Partial<Settings>) => {
+    setSettings((current) => {
+      const next = { ...current, ...patch };
+      saveSettings(next).catch(() => {});
+      return next;
+    });
+  }, []);
+
+  const resetScores = useCallback(async () => {
+    await clearHighScores();
+    setScores([]);
+  }, []);
 
   const gameOver = useCallback(() => {
     setResult({ score: engine.score, kills: engine.kills, level: engine.level, isHighScore: qualifies(scores, engine.score) });
@@ -105,7 +121,18 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   } else if (route === 'about') {
     content = <AboutScreen onBack={home} />;
   } else if (route === 'setup') {
-    content = <SettingsScreen telemetryEnabled={consent === 'granted'} onToggleTelemetry={decide} onBack={home} />;
+    content = (
+      <SetupScreen
+        sound={settings.sound}
+        vibration={settings.vibration}
+        stats={consent === 'granted'}
+        onSound={(sound) => changeSettings({ sound })}
+        onVibration={(vibration) => changeSettings({ vibration })}
+        onStats={decide}
+        onResetScores={resetScores}
+        onBack={home}
+      />
+    );
   } else {
     content = (
       <HomeScreen
