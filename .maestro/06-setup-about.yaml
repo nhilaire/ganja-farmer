@@ -1,0 +1,66 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Setup and About - toggles survive a restart, the story and the version
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Help the farm grow?"
+    timeout: 15000
+- tapOn:
+    id: "consent-refuse"
+# AC-29: toggles.
+- tapOn:
+    id: "home-setup"
+- assertVisible: "SOUND"
+- assertVisible: "VIBRATION"
+- assertVisible: "STATS"
+- assertVisible: "RESET HIGH SCORES"
+- tapOn:
+    id: "setup-sound"
+- assertVisible:
+    id: "setup-sound"
+    checked: false
+- takeScreenshot: 13-setup
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "home-screen"
+    timeout: 15000
+- tapOn:
+    id: "home-setup"
+- assertVisible:
+    id: "setup-sound"
+    checked: false
+- assertVisible:
+    id: "setup-vibration"
+    checked: true
+- assertVisible:
+    id: "setup-stats"
+    checked: false
+- tapOn:
+    id: "setup-back"
+# AC-32: About.
+- tapOn:
+    id: "home-about"
+- assertVisible: "ABOUT"
+- scrollUntilVisible:
+    element: "Why this game"
+    direction: DOWN
+- assertVisible: ".*I played Ganja Farmer for hours as a teenager.*"
+- takeScreenshot: 14-about-story
+- scrollUntilVisible:
+    element: "Version .*"
+    direction: DOWN
+- assertVisible: ".*passionate independent developer.*"
+- takeScreenshot: 15-about-version
+- scrollUntilVisible:
+    element:
+      id: "about-back"
+    direction: DOWN
+- tapOn:
+    id: "about-back"
+- assertVisible:
+    id: "home-screen"

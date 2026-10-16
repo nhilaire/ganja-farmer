@@ -1,0 +1,27 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Background - leaving the app mid-game pauses it
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Help the farm grow?"
+    timeout: 15000
+- tapOn:
+    id: "consent-refuse"
+- tapOn:
+    id: "home-play"
+- assertVisible:
+    id: "game-screen"
+# AC-27: home button, then back to the app.
+- pressKey: Home
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "PAUSED"
+    timeout: 10000
+- takeScreenshot: 12-paused-after-background
+- tapOn: "RESUME"
+- assertVisible:
+    id: "game-screen"

@@ -1,0 +1,45 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Game - HUD, firing, pause button and leaving to the menu
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Help the farm grow?"
+    timeout: 15000
+- tapOn:
+    id: "consent-refuse"
+- tapOn:
+    id: "home-play"
+# AC-08: HUD and pause button.
+- assertVisible:
+    id: "game-screen"
+- assertVisible: "Score: 0000000"
+- assertVisible: "Level: 01"
+- assertVisible: "Plants: 26/26"
+- assertVisible: "[Pistol]"
+- assertVisible:
+    id: "game-pause"
+# Fire at the sky for a while, then capture the playfield.
+- longPressOn:
+    point: "50%,30%"
+- extendedWaitUntil:
+    visible: "NOT-A-REAL-TEXT"
+    timeout: 6000
+    optional: true
+- takeScreenshot: 04-game
+# AC-26: pause overlay with RESUME and MENU.
+- tapOn:
+    id: "game-pause"
+- assertVisible: "PAUSED"
+- assertVisible: "RESUME"
+- assertVisible: "MENU"
+- takeScreenshot: 05-paused
+- tapOn: "RESUME"
+- assertNotVisible: "PAUSED"
+- tapOn:
+    id: "game-pause"
+- tapOn: "MENU"
+- assertVisible:
+    id: "home-screen"

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as NativeSplash from 'expo-splash-screen';
-import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 
 import { FeedbackPolicy } from './audio/feedback';
 import { playFeedback } from './audio/player';
@@ -182,7 +182,12 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
     );
   }
 
-  return <ErrorBoundary>{content}</ErrorBoundary>;
+  return (
+    <ErrorBoundary>
+      <StatusBar hidden />
+      {content}
+    </ErrorBoundary>
+  );
 }
 
 const styles = StyleSheet.create({

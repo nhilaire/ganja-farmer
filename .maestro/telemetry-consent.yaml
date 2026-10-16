@@ -1,19 +1,31 @@
 appId: io.github.nhilaire.ganjafarmer
-name: Telemetry - accept consent and play one round (events checked in logcat by verify.mjs)
+name: Telemetry - accept consent, start, clear a level, lose (events checked in logcat by verify.mjs)
 tags:
   - telemetry
 ---
 - launchApp:
     clearState: true
+- extendedWaitUntil:
+    visible: "Help the farm grow?"
+    timeout: 15000
 - tapOn:
     id: "consent-accept"
 - assertVisible:
     id: "home-screen"
+# game_start
 - tapOn:
     id: "home-play"
+# level_complete (skip-level cheat)
 - tapOn:
-    id: "game-tap-zone"
+    point: "3%,4%"
+    repeat: 3
+    delay: 120
 - extendedWaitUntil:
-    visible: "Partie terminée"
-    timeout: 20000
+    visible: "Tap to continue"
+    timeout: 10000
+- tapOn: "Tap to continue"
+# game_over: without firing, the soldiers burn the field.
+- extendedWaitUntil:
+    visible: "GAME OVER"
+    timeout: 480000
 - takeScreenshot: telemetry-game-over

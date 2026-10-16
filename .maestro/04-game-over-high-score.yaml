@@ -1,0 +1,79 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Game over - lose the field, enter a high score, see it after a relaunch, idle table, reset
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Help the farm grow?"
+    timeout: 15000
+- tapOn:
+    id: "consent-refuse"
+- tapOn:
+    id: "home-play"
+# A qualifying score: the skip-level cheat gives the level-1 bonus (1000 points).
+- tapOn:
+    point: "3%,4%"
+    repeat: 3
+    delay: 120
+- extendedWaitUntil:
+    visible: "Tap to continue"
+    timeout: 10000
+- tapOn: "Tap to continue"
+# Without firing, the soldiers burn the whole field.
+- extendedWaitUntil:
+    visible: "GAME OVER"
+    timeout: 480000
+- assertVisible: "Score: 0001000"
+- assertVisible: "Level: 2"
+# AC-23: name entry on a top-10 score.
+- extendedWaitUntil:
+    visible: "NEW HIGH SCORE!"
+    timeout: 6000
+- takeScreenshot: 08-game-over
+- tapOn:
+    id: "gameover-name"
+- inputText: "IRIE"
+- hideKeyboard
+- tapOn:
+    id: "gameover-save"
+- assertVisible: "Score saved!"
+- tapOn:
+    id: "gameover-menu"
+- tapOn:
+    id: "home-scores"
+- assertVisible: "IRIE"
+- assertVisible: "0001000"
+- takeScreenshot: 09-high-scores
+# AC-25: still there after a relaunch.
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "home-scores"
+    timeout: 15000
+# AC-33: after 30 s without a touch, the table shows by itself; a tap returns home.
+- extendedWaitUntil:
+    visible: "HIGH SCORES"
+    timeout: 40000
+- assertVisible: "IRIE"
+- takeScreenshot: 10-idle-scores
+- tapOn: "HIGH SCORES"
+- assertVisible:
+    id: "home-screen"
+# AC-29: RESET HIGH SCORES asks first, then empties the table.
+- tapOn:
+    id: "home-setup"
+- tapOn:
+    id: "setup-reset"
+- assertVisible: "Erase all high scores, Rasta?"
+- takeScreenshot: 11-reset-confirm
+- tapOn:
+    id: "setup-reset-yes"
+- tapOn:
+    id: "setup-back"
+- assertVisible:
+    id: "home-screen"
+- assertNotVisible:
+    id: "home-scores"
