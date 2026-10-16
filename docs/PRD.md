@@ -6,7 +6,7 @@ Final app name: Ganja Farmer
 Android package: io.github.nhilaire.ganjafarmer
 Version target: 0.1.0
 Player language: en-US (`factory-app.json` `language`)
-Last updated: 2026-10-16 (AC-06, AC-07, AC-22 amended with the user after the first verification)
+Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40 and APK size after the phone test)
 
 > Written in English. **Player-facing strings are in English too** (user's decision, an exception to the factory's
 > French default); they are quoted in the "Player-facing copy" section.
@@ -127,6 +127,9 @@ engine stepped with `dt` (seconds) and an injectable random source, so it can be
 ### Controls and firing
 
 - Touch down: aim angle = angle from the player to the finger, firing on. Move: re-aim. Release: firing off.
+- Several fingers: firing stays on while at least one finger is down; the aim follows the last finger placed that is
+  still down (lifting it falls back to the previous one). Firing stops only when the last finger is lifted
+  (amended after the first phone test; the source stopped firing as soon as any finger was lifted).
 - While firing, one shot every `1 / fireRate` s. Each bullet's angle = aim + uniform(-spread/2, +spread/2).
 - Bullets are not slowed by Holy Smoke or Bullet Time. They are removed 20 px outside the screen.
 - A non-penetrating bullet stops at its first hit. A penetrating one (laser) goes through air enemies and
@@ -405,7 +408,8 @@ Business and technical indicators followed in Firebase (free Spark plan). Detail
 
 - Performance: no visible jank during play on a mid-range Android phone (target 60 fps with 4 helicopters,
   15 paratroopers and active effects); cold start < 3 s (time to the first frame, measured by `verify.mjs`).
-- APK size (arm64): target < 40 MB.
+- APK size (arm64): target < 60 MB (amended with the user after the first phone test: 54 MB with Skia and
+  Reanimated; the initial 40 MB target did not account for them).
 - Works fully offline. No account. No ads. No backend.
 - Android: minSdk from the stack defaults; **landscape only**.
 - Privacy: opt-in telemetry, no personal data, AD_ID permission removed, high-score names stay on the phone.
@@ -456,6 +460,8 @@ phone, `[manual]` human judgement (kept rare).
   once, and when the next level starts it is still alive (D1).
 - AC-39 [unit] Given a laser bullet, then it goes through air enemies and paratroopers but is stopped by a
   power-up orb or a bomb.
+- AC-40 [unit] Given one finger held down while firing, when a second finger touches the screen and the first one is
+  lifted, then firing continues and aims at the second finger; firing stops only when no finger is left.
 - AC-15 [unit] Given kills, then each enemy adds its score, air kills by bullets within 2.0 s build a combo with
   multiplier `1 + 0.5 (n - 1)` and `floor` rounding, and paratroopers, bombs and Jah Lightning kills are not
   multiplied.

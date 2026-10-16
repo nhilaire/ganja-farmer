@@ -5,6 +5,7 @@ import { AppState, BackHandler, GestureResponderEvent, Pressable, StyleSheet, Te
 import { CheatDetector } from '../game/cheats';
 import { GameEngine } from '../game/engine';
 import { PLANT_COUNT } from '../game/layout';
+import { Aim, TouchTracker } from '../game/touches';
 import { GameEvent } from '../game/types';
 import { en, JAH_QUOTES } from '../i18n/en';
 import { setRenderLayout } from '../render/renderer';
@@ -27,6 +28,13 @@ type Props = {
 
 const MAX_DT = 0.05; // clamp long frames (app resumed, GC pause) to keep the simulation stable
 
+// Fingers that changed in this event; tests and some platforms only give the top-level touch.
+function changed(e: GestureResponderEvent): { identifier: number; pageX: number; pageY: number }[] {
+  const list = e.nativeEvent.changedTouches;
+  const touches = list && list.length > 0 ? list : [e.nativeEvent];
+  return touches.map((t) => ({ identifier: Number(t.identifier ?? 0), pageX: t.pageX, pageY: t.pageY }));
+}
+
 function pickQuote(): string {
   return JAH_QUOTES[Math.floor(Math.random() * JAH_QUOTES.length)];
 }
@@ -38,6 +46,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
   const [message, setMessage] = useState<{ title: string; body?: string } | null>(null);
   const [bossWarning, setBossWarning] = useState<string | null>(null);
   const cheats = useMemo(() => new CheatDetector(engine.layout), [engine]);
+  const fingers = useMemo(() => new TouchTracker(), []);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const onEventsRef = useRef(onEvents);
   onEventsRef.current = onEvents;
@@ -113,9 +122,10 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
   const pause = useCallback(() => {
     engine.paused = true;
+    fingers.clear();
     engine.setFiring(false);
     setPaused(true);
-  }, [engine]);
+  }, [engine, fingers]);
 
   const resume = useCallback(() => {
     engine.paused = false;
@@ -141,27 +151,44 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
   const interactive = !paused && overlay.kind === 'none' && engine.phase !== 'over';
 
+  // Several fingers (AC-40): fire while any finger is down, aim at the last one placed.
+  const applyAim = useCallback(
+    ({ firing, aim }: Aim) => {
+      if (aim) engine.aimAt(aim.x, aim.y);
+      engine.setFiring(firing);
+    },
+    [engine],
+  );
+
   const onTouchStart = useCallback(
     (e: GestureResponderEvent) => {
       if (!interactive) return;
-      const { pageX, pageY } = e.nativeEvent;
-      const cheat = cheats.tap(pageX, pageY, Date.now());
-      if (cheat === 'skipLevel') engine.forceComplete();
-      else if (cheat === 'restorePlants') engine.restorePlants(2);
-      engine.aimAt(pageX, pageY);
-      engine.setFiring(true);
+      for (const t of changed(e)) {
+        const cheat = cheats.tap(t.pageX, t.pageY, Date.now());
+        if (cheat === 'skipLevel') engine.forceComplete();
+        else if (cheat === 'restorePlants') engine.restorePlants(2);
+        applyAim(fingers.down(t.identifier, t.pageX, t.pageY));
+      }
     },
-    [interactive, cheats, engine],
+    [interactive, cheats, engine, fingers, applyAim],
   );
 
   const onTouchMove = useCallback(
     (e: GestureResponderEvent) => {
-      if (interactive) engine.aimAt(e.nativeEvent.pageX, e.nativeEvent.pageY);
+      if (!interactive) return;
+      for (const t of changed(e)) applyAim(fingers.move(t.identifier, t.pageX, t.pageY));
     },
-    [interactive, engine],
+    [interactive, fingers, applyAim],
   );
 
-  const onTouchEnd = useCallback(() => engine.setFiring(false), [engine]);
+  const onTouchEnd = useCallback(
+    (e: GestureResponderEvent) => {
+      for (const t of changed(e)) applyAim(fingers.up(t.identifier));
+    },
+    [fingers, applyAim],
+  );
+
+  const onTouchCancel = useCallback(() => applyAim(fingers.clear()), [fingers, applyAim]);
 
   const picture = createPicture((canvas) => drawScene(canvas, engine, { bossWarning }));
 
@@ -172,7 +199,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      onTouchCancel={onTouchEnd}
+      onTouchCancel={onTouchCancel}
     >
       <Canvas style={StyleSheet.absoluteFill}>
         <Picture picture={picture} />
