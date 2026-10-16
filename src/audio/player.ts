@@ -36,8 +36,9 @@ export function playSound(name: SoundName): void {
   try {
     if (!modeSet) {
       modeSet = true;
-      // Mix with the player's music instead of stopping it; respect the silent switch.
-      setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
+      // Mix with the player's music instead of stopping it. Media plays whatever the ringer mode (Android convention:
+      // with false, expo-audio mutes everything when the phone is on silent or vibrate); SOUND in SETUP is the mute.
+      setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' }).catch(() => {});
     }
     const p = player(name);
     p.seekTo(0).catch(() => {});

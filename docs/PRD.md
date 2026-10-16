@@ -362,7 +362,8 @@ Level multipliers: `speedMult = 1 + 0.10 (L - 1)`, `hpMult = 1 + 0.05 (L - 1)`, 
   - Jah blessing
   - game over
 
-  Rapid-fire weapons limit the shot sound to at most 10 plays/s. SOUND off mutes everything. No music.
+  Rapid-fire weapons limit the shot sound to at most 10 plays/s. SOUND off mutes everything. No music. Sounds play
+  on the media stream, also when the phone ringer is on silent or vibrate (found at the phone test).
 - **Haptics:** 30 ms when a plant catches fire; pattern `[0, 50, 30, 50, 30, 100]` when a boss is defeated;
   pattern `[0, 100, 50, 200]` at game over. VIBRATION off disables them all.
 

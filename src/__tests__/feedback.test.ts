@@ -1,7 +1,8 @@
+import { setAudioModeAsync } from 'expo-audio';
 import { Vibration } from 'react-native';
 
 import { FeedbackPolicy, VIBRATION_BOSS_DEFEATED, VIBRATION_GAME_OVER, VIBRATION_PLANT_BURNING } from '../audio/feedback';
-import { playFeedback } from '../audio/player';
+import { playFeedback, playSound } from '../audio/player';
 import { GameEvent } from '../game/types';
 
 const ON = { sound: true, vibration: true };
@@ -61,5 +62,11 @@ describe('sound and vibration policy (AC-30)', () => {
     const spy = jest.spyOn(Vibration, 'vibrate').mockImplementation(() => {});
     playFeedback({ sounds: ['explosion'], vibrations: [30] });
     expect(spy).toHaveBeenCalledWith(30);
+  });
+
+  // Phone test 2: with the ringer on silent or vibrate, expo-audio muted every sound when playsInSilentMode was false.
+  it('plays game sounds on the media stream whatever the ringer mode', () => {
+    playSound('explosion');
+    expect(setAudioModeAsync).toHaveBeenCalledWith(expect.objectContaining({ playsInSilentMode: true }));
   });
 });

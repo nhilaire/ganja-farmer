@@ -3,9 +3,9 @@
 Phone install: PASS
 User acceptance: pending
 Date: 2026-10-16
-Commit: afeee55
+Commit: fd351f7
 APK: ganja-farmer-0.1.0-arm64-v8a.apk (54 MB, arm64-v8a)
-SHA-256: 943ff7ed7a334f220a2042c57b1209e870ca0fd4b08f28cb0291724243d77951
+SHA-256: 3ee79a5bf5d2fd48bb202fe84da3786c4626e6550d92c531e8f7cbf1b761ff98
 Signature: release signature valid
 Phone: Android 11 (API 30, arm64-v8a)
 Launch check: alive after 10 s, no fatal error
@@ -21,3 +21,7 @@ Launch check: alive after 10 s, no fatal error
   (expo-audio PLAYING, frames delivered) but they were far too quiet for a phone speaker (pistol shot about 5% of
   full scale, explosion mostly bass). Fix: every generated sound normalized to a 0.95 peak, brighter shot and
   explosion, playback volume 0.6 for shots and 1.0 for the rest.
+- 2026-10-16, third phone test: still no sound. Phone log: players created and started at volume 1.0, media volume
+  30/30 on the speaker, but the ringer is on silent/vibrate and expo-audio mutes playback in that case when
+  `playsInSilentMode` is false. Fix: `playsInSilentMode: true` (media stream, Android convention); SOUND in SETUP
+  stays the in-game mute.
