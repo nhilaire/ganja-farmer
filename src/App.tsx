@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as NativeSplash from 'expo-splash-screen';
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 
+import { FeedbackPolicy } from './audio/feedback';
+import { playFeedback } from './audio/player';
 import { GameEngine } from './game/engine';
 import { HighScoreEntry, qualifies } from './game/highScores';
 import { makeLayout } from './game/layout';
@@ -33,6 +35,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const [route, setRoute] = useState<Route>('home');
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const feedback = useMemo(() => new FeedbackPolicy(), []);
   const [result, setResult] = useState({ score: 0, kills: 0, level: 1, isHighScore: false });
   // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
   const engine = useMemo(() => {
@@ -90,12 +93,13 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
 
   const onGameEvents = useCallback(
     (events: GameEvent[]) => {
+      playFeedback(feedback.feedbackFor(events, settings, Date.now()));
       for (const event of events) {
         const tracked = telemetryFor(event, engine);
         if (tracked) trackMapped(tracked);
       }
     },
-    [engine],
+    [engine, feedback, settings],
   );
 
   const changeSettings = useCallback((patch: Partial<Settings>) => {

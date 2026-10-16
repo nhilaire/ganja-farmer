@@ -4,6 +4,7 @@
 |---|---|---|
 | `icon.png`, `android-icon-foreground.png`, `android-icon-background.png`, `android-icon-monochrome.png`, `favicon.png` | AI-generated for the author of this game (pixel-art "GANJA FARMER" artwork), reused from the author's earlier prototype | owned by the author, published with this repository |
 | `splash-icon.png` | same artwork, landscape version (1536x1024) | owned by the author, published with this repository |
+| `sfx/*.wav` (10 short sound effects) | synthesised by `scripts/generate-sfx.mjs` in this repository (no samples, no third-party audio) | same licence as the code |
 
 In-game graphics are drawn in code with Skia (`src/render/renderer.ts`): no image files.
 
