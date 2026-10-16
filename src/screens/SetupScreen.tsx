@@ -1,4 +1,4 @@
-// SETUP (was "Coming soon" in the source): sound, vibration and statistics toggles, reset of the high scores.
+// SETUP (was "Coming soon" in the source): sound, music, vibration and statistics toggles, reset of the high scores.
 import { useEffect, useState } from 'react';
 import { BackHandler, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
@@ -7,9 +7,11 @@ import { colors, spacing } from '../ui/theme';
 
 type Props = {
   sound: boolean;
+  music: boolean;
   vibration: boolean;
   stats: boolean;
   onSound: (on: boolean) => void;
+  onMusic: (on: boolean) => void;
   onVibration: (on: boolean) => void;
   onStats: (on: boolean) => void;
   onResetScores: () => Promise<void>;
@@ -44,7 +46,7 @@ function Action({ label, onPress, testID, color }: { label: string; onPress: () 
   );
 }
 
-export function SetupScreen({ sound, vibration, stats, onSound, onVibration, onStats, onResetScores, onBack }: Props) {
+export function SetupScreen({ sound, music, vibration, stats, onSound, onMusic, onVibration, onStats, onResetScores, onBack }: Props) {
   const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export function SetupScreen({ sound, vibration, stats, onSound, onVibration, onS
       <View style={styles.rasta} />
       <View style={styles.list}>
         <Toggle label={en.setup.sound} value={sound} onChange={onSound} testID="setup-sound" />
+        <Toggle label={en.setup.music} value={music} onChange={onMusic} testID="setup-music" />
         <Toggle label={en.setup.vibration} value={vibration} onChange={onVibration} testID="setup-vibration" />
         <Toggle label={en.setup.stats} help={en.setup.statsHelp} value={stats} onChange={onStats} testID="setup-stats" />
       </View>

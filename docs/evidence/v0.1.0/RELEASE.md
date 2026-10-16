@@ -29,3 +29,5 @@ Launch check: alive after 10 s, no fatal error
   come back from time to time until destroyed, and regularly once the level is nearly over. Decided with the user:
   A-10 and crop duster return after 5-10 s, at most 2 s once the quota is reached, keeping their HP (PRD D6, AC-41,
   PLAN T-25).
+- 2026-10-16: the author supplied a background music track ("Rasta Rocket Man", own work): looped everywhere at 25 %,
+  MUSIC toggle in SETUP (PRD amended, AC-42, PLAN T-26).

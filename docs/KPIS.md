@@ -17,7 +17,7 @@ Source of truth: `docs/PRD.md` sections "Telemetry events" and "KPIs". The typed
 | boss_defeated | a boss is destroyed (bullet or Jah Lightning) | level |
 | game_over | the last plant is destroyed | level, score, duration_s, cause (`soldier`, `bomb`, `cropduster`, `ufo`) |
 | game_quit | MENU from the Paused overlay | level, duration_s |
-| settings_change | a SETUP toggle changes or scores are reset | setting (`sound`, `vibration`, `telemetry`, `reset_scores`), value (`on`, `off`, `done`) |
+| settings_change | a SETUP toggle changes or scores are reset | setting (`sound`, `music`, `vibration`, `telemetry`, `reset_scores`), value (`on`, `off`, `done`) |
 
 `duration_s` is the active play time of the whole game (pauses excluded). High-score names are never sent.
 

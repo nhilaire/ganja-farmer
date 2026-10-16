@@ -42,6 +42,6 @@ jest.mock('@shopify/react-native-skia', () => {
 });
 
 jest.mock('expo-audio', () => ({
-  createAudioPlayer: jest.fn(() => ({ play: jest.fn(), seekTo: jest.fn(() => Promise.resolve()), volume: 1 })),
+  createAudioPlayer: jest.fn(() => ({ play: jest.fn(), pause: jest.fn(), seekTo: jest.fn(() => Promise.resolve()), volume: 1, loop: false })),
   setAudioModeAsync: jest.fn(() => Promise.resolve()),
 }));

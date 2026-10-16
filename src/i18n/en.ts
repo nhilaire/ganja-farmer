@@ -101,6 +101,7 @@ export const en = {
   setup: {
     title: 'SETUP',
     sound: 'SOUND',
+    music: 'MUSIC',
     vibration: 'VIBRATION',
     stats: 'STATS',
     statsHelp: 'Anonymous statistics: levels, game length, crashes. No name, no ID.',

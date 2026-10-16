@@ -2,7 +2,7 @@
 // Params are numbers or short lowercase enums. Never identifiers, names, free text or locations.
 
 export type GameOverCause = 'soldier' | 'bomb' | 'cropduster' | 'ufo';
-export type SettingName = 'sound' | 'vibration' | 'telemetry' | 'reset_scores';
+export type SettingName = 'sound' | 'music' | 'vibration' | 'telemetry' | 'reset_scores';
 export type SettingValue = 'on' | 'off' | 'done';
 
 export type TelemetryEvents = {

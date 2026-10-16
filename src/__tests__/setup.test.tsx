@@ -18,8 +18,8 @@ describe('setup screen (AC-29, AC-30)', () => {
   }
 
   it('turns sound and vibration on by default', async () => {
-    expect(DEFAULT_SETTINGS).toEqual({ sound: true, vibration: true });
-    expect(await loadSettings()).toEqual({ sound: true, vibration: true });
+    expect(DEFAULT_SETTINGS).toEqual({ sound: true, music: true, vibration: true });
+    expect(await loadSettings()).toEqual({ sound: true, music: true, vibration: true });
   });
 
   it('shows the SOUND, VIBRATION and STATS toggles and the reset button', async () => {

@@ -6,7 +6,7 @@ Final app name: Ganja Farmer
 Android package: io.github.nhilaire.ganjafarmer
 Version target: 0.1.0
 Player language: en-US (`factory-app.json` `language`)
-Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40, AC-41 (D6) and APK size after the phone tests)
+Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40, AC-41 (D6), AC-42 (music) and APK size after the phone tests)
 
 > Written in English. **Player-facing strings are in English too** (user's decision, an exception to the factory's
 > French default); they are quoted in the "Player-facing copy" section.
@@ -105,7 +105,7 @@ flowchart LR
 - **Game over:** "GAME OVER", then `Score: 0000000`, `Kills: n`, `Level: n`. The buttons appear after 3 s.
   On a top-10 score: "NEW HIGH SCORE!", a name field (max 12 characters) and SAVE, then "Score saved!".
   RETRY and MENU.
-- **Setup:** toggles for SOUND, VIBRATION and STATS, plus a RESET HIGH SCORES button with a confirmation dialog.
+- **Setup:** toggles for SOUND, MUSIC, VIBRATION and STATS, plus a RESET HIGH SCORES button with a confirmation dialog.
   BACK.
 - **About:** "The Original Game" (source text), "Why this game" (the story from the brief), "This Version"
   (tribute, not affiliated, made by a passionate independent developer), "Built with" (React Native, Expo, Skia),
@@ -368,8 +368,12 @@ Level multipliers: `speedMult = 1 + 0.10 (L - 1)`, `hpMult = 1 + 0.05 (L - 1)`, 
   - Jah blessing
   - game over
 
-  Rapid-fire weapons limit the shot sound to at most 10 plays/s. SOUND off mutes everything. No music. Sounds play
+  Rapid-fire weapons limit the shot sound to at most 10 plays/s. SOUND off mutes every sound effect. Sounds play
   on the media stream, also when the phone ringer is on silent or vibrate (found at the phone test).
+- **Background music** (added at the phone test): "Rasta Rocket Man" (`assets/music/rasta-rocket-man.mp3`, made by
+  the author for this game), looped on every screen at volume 0.25, below the sound effects. It pauses when the app
+  leaves the foreground and resumes when it comes back. MUSIC in SETUP (on by default, saved) turns it on or off
+  independently of SOUND.
 - **Haptics:** 30 ms when a plant catches fire; pattern `[0, 50, 30, 50, 30, 100]` when a boss is defeated;
   pattern `[0, 100, 50, 200]` at game over. VIBRATION off disables them all.
 
@@ -385,7 +389,7 @@ identifiers, no free text, high-score names are never sent.
 | boss_defeated | a boss is destroyed (by a bullet or by Jah Lightning) | level | Level funnel |
 | game_over | the last plant is destroyed | level, score, duration_s, cause (`soldier`, `bomb`, `cropduster`, `ufo`) | Drop-off by level, game-over cause, game duration |
 | game_quit | MENU from the Paused overlay | level, duration_s | Drop-off by level, game duration |
-| settings_change | a SETUP toggle changes or the scores are reset | setting (`sound`, `vibration`, `telemetry`, `reset_scores`), value (`on`, `off`, `done`) | Settings usage |
+| settings_change | a SETUP toggle changes or the scores are reset | setting (`sound`, `music`, `vibration`, `telemetry`, `reset_scores`), value (`on`, `off`, `done`) | Settings usage |
 
 - `duration_s`: active play time of the whole game (pauses excluded), rounded to seconds.
 - `cause`: what destroyed the last plant. A soldier's fire and a crop duster's fire are told apart by who set the
@@ -472,6 +476,9 @@ phone, `[manual]` human judgement (kept rare).
 - AC-41 [unit] Given an A-10 or a crop duster that leaves the screen alive, then it is not drawn nor hittable while
   away, the level does not complete, and it comes back after 5-10 s (at most 2 s once the quota is reached) from a
   random side with the same HP and a new pass (A-10: 1-2 new bombs; crop duster: 5 new attacks) (D6).
+- AC-42 [unit] Given MUSIC on (default), then the background music loops at volume 0.25 from app start; it pauses
+  when the app leaves the foreground and resumes on return; MUSIC off stops it and the choice survives a restart;
+  SOUND off does not stop the music.
 - AC-15 [unit] Given kills, then each enemy adds its score, air kills by bullets within 2.0 s build a combo with
   multiplier `1 + 0.5 (n - 1)` and `floor` rounding, and paratroopers, bombs and Jah Lightning kills are not
   multiplied.
@@ -507,7 +514,7 @@ phone, `[manual]` human judgement (kept rare).
   overlay is shown and the game has not advanced.
 - AC-28 [unit] Given the pause state, when time advances, then no entity, timer, combo window or power-up spawn
   timer changes.
-- AC-29 [e2e] Given SETUP, then it shows SOUND, VIBRATION and STATS toggles and RESET HIGH SCORES. Changed toggles
+- AC-29 [e2e] Given SETUP, then it shows SOUND, MUSIC, VIBRATION and STATS toggles and RESET HIGH SCORES. Changed toggles
   survive an app restart. RESET HIGH SCORES asks for confirmation and then empties the SCORES table.
 - AC-30 [unit] Given SOUND off, then no sound effect is played; given VIBRATION off, then no vibration is
   requested; both are on by default.
@@ -561,7 +568,7 @@ English, casual tone with rasta winks. Kept from the source unless marked new. A
 | consent.body | Share anonymous game statistics (levels reached, game length, crashes) to help improve Ganja Farmer. No name, no ID, no ads. You can change this anytime in SETUP. (new) |
 | consent.accept / consent.refuse | YES, SHARE STATS / NO THANKS (new) |
 | setup.title | SETUP |
-| setup.sound / setup.vibration / setup.stats | SOUND / VIBRATION / STATS (new) |
+| setup.sound / setup.music / setup.vibration / setup.stats | SOUND / MUSIC / VIBRATION / STATS (new) |
 | setup.on / setup.off | ON / OFF (new) |
 | setup.reset | RESET HIGH SCORES (new) |
 | setup.resetConfirm | Erase all high scores, Rasta? (new) |
@@ -580,7 +587,6 @@ English, casual tone with rasta winks. Kept from the source unless marked new. A
 ## Out of scope
 
 - Online leaderboard, accounts, cloud save, multiplayer.
-- Music (sound effects only).
 - Web and iOS builds; Play Store publication.
 - New weapons, enemies, power-ups or rule changes beyond the source code and deviations D1-D6; rebalancing.
 - Rocket area damage (explosions stay visual, as in the source).

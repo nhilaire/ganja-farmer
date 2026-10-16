@@ -162,6 +162,11 @@ export class GameEngine {
     return this.plants.reduce((n, p) => n + (p.alive ? 1 : 0), 0);
   }
 
+  // Air enemies on screen: planes away waiting to come back (D6) are neither drawn nor hittable.
+  get visibleAirEnemies(): AirEnemy[] {
+    return this.airEnemies.filter((e) => !e.away);
+  }
+
   get bossLevel(): boolean {
     return this.waves.isBossLevel;
   }

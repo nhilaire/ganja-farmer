@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as NativeSplash from 'expo-splash-screen';
-import { ActivityIndicator, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, AppState, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 
 import { FeedbackPolicy } from './audio/feedback';
+import { backgroundMusic } from './audio/music';
 import { playFeedback } from './audio/player';
 import { GameEngine } from './game/engine';
 import { HighScoreEntry, qualifies } from './game/highScores';
@@ -36,6 +37,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const feedback = useMemo(() => new FeedbackPolicy(), []);
+  const [foreground, setForeground] = useState(AppState.currentState === 'active' || AppState.currentState == null);
   const [result, setResult] = useState({ score: 0, kills: 0, level: 1, isHighScore: false });
   // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
   const engine = useMemo(() => {
@@ -59,6 +61,16 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
       alive = false;
     };
   }, []);
+
+  // Background music (AC-42): on every screen once the stored settings are known, paused in the background.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => setForeground(state === 'active'));
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    backgroundMusic.update({ enabled: settings.music && consent !== 'loading', foreground });
+  }, [settings.music, consent, foreground]);
 
   const decide = useCallback(async (granted: boolean) => {
     const value = granted ? 'granted' : 'denied';
@@ -161,9 +173,11 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
     content = (
       <SetupScreen
         sound={settings.sound}
+        music={settings.music}
         vibration={settings.vibration}
         stats={consent === 'granted'}
         onSound={(sound) => changeSettings({ sound })}
+        onMusic={(music) => changeSettings({ music })}
         onVibration={(vibration) => changeSettings({ vibration })}
         onStats={toggleStats}
         onResetScores={resetScores}

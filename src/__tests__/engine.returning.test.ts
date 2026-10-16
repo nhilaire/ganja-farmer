@@ -1,6 +1,6 @@
 import { constantRng } from '../game/rng';
 import { WaveManager } from '../game/waves';
-import { fixedEngine, run, W } from '../test-utils/engine';
+import { fixedEngine, ofType, run, W } from '../test-utils/engine';
 
 // Engine with a quiet sky: no scripted spawn, no respawn, the quota not reached.
 function setup(level = 12, value = 0.5) {
@@ -109,5 +109,32 @@ describe('returning planes (AC-41, D6)', () => {
     Object.assign(ufo, { x: W + ufo.width + 49, direction: 1, vx: 50 });
     engine.update(0.05);
     expect(engine.airEnemies).not.toContain(ufo);
+  });
+
+  it('is not drawn while away, and drawn again once back', () => {
+    const engine = setup();
+    const plane = leaving(engine, 'a10');
+    expect(engine.visibleAirEnemies).not.toContain(plane);
+    run(engine, (plane.returnTimer as number) + 0.1, 0.05);
+    expect(engine.visibleAirEnemies).toContain(plane);
+  });
+
+  it('keeps the engine from completing the level while a plane is away', () => {
+    const engine = setup();
+    const plane = leaving(engine, 'a10');
+    engine.waves.heliKills = engine.waves.config.requiredHeliKills;
+    const events = run(engine, 1.5, 0.05); // the plane returns within 2 s; the level must not end before
+    expect(ofType(events, 'levelComplete')).toHaveLength(0);
+    expect(engine.phase).toBe('playing');
+    expect(engine.airEnemies).toContain(plane);
+  });
+
+  it('a returning crop duster sets plants on fire again on its new pass', () => {
+    const engine = setup(12, 0.9);
+    const duster = leaving(engine, 'cropduster');
+    run(engine, (duster.returnTimer as number) + 0.1, 0.05);
+    Object.assign(duster, { y: engine.layout.groundY - 50, x: engine.plants[3].x, vx: 0 });
+    const events = run(engine, 0.2, 0.01);
+    expect(ofType(events, 'plantBurning').length).toBeGreaterThan(0);
   });
 });
