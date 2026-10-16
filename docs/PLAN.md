@@ -34,9 +34,13 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-20 Telemetry calls for the 6 PRD events, cause tracking, consent gating (AC-03, AC-04, AC-05) - proof: unit
 - [x] T-21 Generated sound effects (no third-party audio) with expo-audio, haptics, both behind settings (AC-30, AC-37) - proof: unit
 - [x] T-22 Maestro flows: consent, home, game HUD, cheat skip and transition, game over and high score, relaunch persistence, pause, background, setup, about, idle scores, telemetry (AC-01, AC-02, AC-05, AC-06, AC-07, AC-08, AC-22, AC-23, AC-25, AC-26, AC-27, AC-29, AC-32, AC-33) - proof: e2e
-- [ ] T-23 Device criteria prepared for verify and release: icon/name/landscape, cold start, no crash, feel check by the user (AC-34, AC-35, AC-36, AC-37) - proof: device
+- [x] T-23 Device criteria prepared for verify and release: icon/name/landscape, cold start, no crash, feel check by the user (AC-34, AC-35, AC-36, AC-37) - proof: device (emulator check done during build; formal proofs in /verify-app and /release-apk)
 
 ## Notes
+
+- Build findings: Skia 2.6 needs react-native-reanimated at runtime (added); a stale Metro cache from a build
+  made before Reanimated was installed bundled Skia without worklets and crashed on the first canvas (cleared);
+  Maestro waits fail at once right after some screen changes, so flows use a plain evalScript pause there.
 
 - Source of rules: `C:/dev/GanjaFarmer` code (PRD "Reference rule"), with deviations D1-D5. The source is a local
   folder outside this repository; the port copies code and assets, never references the path at runtime.
