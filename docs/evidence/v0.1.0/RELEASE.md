@@ -39,3 +39,7 @@ Launch check: alive after 10 s, no fatal error
   whole git history before the first push, and v0.1.0 is re-verified and re-accepted.
 - 2026-10-16, sixth phone test (build 67220ab, arm64 56 MB, music bundled from the local file): the user wants the
   music on their own phone even though it cannot be on GitHub; music, icon and feel checked: accepted.
+- 2026-10-16: GitHub release v0.1.0 published with a public APK built without the music (assets/music/local moved
+  aside): ganja-farmer-0.1.0-arm64-v8a-no-music.apk, 54 MB, SHA-256 18ee54018aad39c75f24e9cc6baaaa7318c7f399d882e9d7a5e98ad07ba7c0d8;
+  no .mp3 and no Suno metadata in the APK; checked on the emulator (universal no-music build): runs, sound effects,
+  no music, no crash. The author's phone keeps the music build (SHA ed353721...6e34).
