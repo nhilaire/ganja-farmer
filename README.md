@@ -37,6 +37,10 @@ npm test
 npm run sfx   # regenerates the synthesised sound effects in assets/sfx
 ```
 
+The background music is not part of this repository (its licence does not allow redistribution). Without it the
+game builds and runs without music; with your own track at `assets/music/local/rasta-rocket-man.mp3`, it loops
+in the background (see `metro.config.js`).
+
 Firebase configuration is not part of this repository. To build with telemetry, create your own Firebase project
 and place its `google-services.json` in `firebase/` (see [firebase/README.md](firebase/README.md)). Without it,
 the game builds and runs with telemetry disabled.

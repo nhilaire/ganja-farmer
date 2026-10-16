@@ -45,6 +45,12 @@ describe('background music (AC-42)', () => {
     expect(music.playing).toBe(false);
   });
 
+  it('never plays when the track is not available (public repository build)', () => {
+    const music = new BackgroundMusic(null);
+    music.update({ enabled: true, foreground: true });
+    expect(music.playing).toBe(false);
+  });
+
   it('is on by default', () => {
     expect(DEFAULT_SETTINGS.music).toBe(true);
   });

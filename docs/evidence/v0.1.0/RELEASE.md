@@ -33,3 +33,7 @@ Launch check: alive after 10 s, no fatal error
   MUSIC toggle in SETUP (PRD amended, AC-42, PLAN T-26).
 - 2026-10-16, fifth phone test (build 2a4a544, arm64 56 MB): music, returning planes, sound, two-finger firing, icon and
   feel checked by the user: accepted.
+- 2026-10-16, before publication: the privacy audit found the music file carried the Suno account handle and song
+  link in its tags, and the track was made on the Suno free plan (not redistributable). Decided with the user: the
+  music stays local (git-ignored `assets/music/local/`, bundled only when present), the file is removed from the
+  whole git history before the first push, and v0.1.0 is re-verified and re-accepted.
