@@ -116,7 +116,7 @@ describe('app flow: saved score appears in SCORES (AC-23, AC-25)', () => {
 
   it('shows a stored high score in the SCORES table after a relaunch', async () => {
     await AsyncStorage.setItem('highScores.v1', JSON.stringify([{ name: 'IRIE', score: 2500, level: 2, kills: 7, date: 'x' }]));
-    await render(<App />);
+    await render(<App splashMs={0} />);
     await fireEvent.press(await screen.findByText('SCORES'));
     expect(screen.getByText('IRIE')).toBeTruthy();
     expect(screen.getByText('0002500')).toBeTruthy();

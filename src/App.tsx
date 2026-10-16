@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import * as NativeSplash from 'expo-splash-screen';
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 
 import { GameEngine } from './game/engine';
@@ -11,15 +12,20 @@ import { GameScreen } from './screens/GameScreen';
 import { HighScoresScreen } from './screens/HighScoresScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { SPLASH_MS, SplashScreen } from './screens/SplashScreen';
 import { loadHighScores, saveHighScore } from './storage/highScores';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { applyConsent } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { colors } from './ui/theme';
 
+// Keep the native splash until the stored state is loaded, then show the 2 s artwork splash.
+NativeSplash.preventAutoHideAsync().catch(() => {});
+
 type Route = 'home' | 'scores' | 'game' | 'gameOver' | 'setup' | 'about';
 
-export default function App() {
+export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
+  const [splash, setSplash] = useState(splashMs > 0);
   const [consent, setConsentState] = useState<Consent | 'loading'>('loading');
   const [route, setRoute] = useState<Route>('home');
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
@@ -38,6 +44,7 @@ export default function App() {
       if (alive) {
         setScores(storedScores);
         setConsentState(storedConsent);
+        NativeSplash.hideAsync().catch(() => {});
       }
     })();
     return () => {
@@ -72,8 +79,16 @@ export default function App() {
     [result],
   );
 
+  useEffect(() => {
+    if (!splash || consent === 'loading') return;
+    const timer = setTimeout(() => setSplash(false), splashMs);
+    return () => clearTimeout(timer);
+  }, [splash, consent, splashMs]);
+
   let content: React.ReactNode;
-  if (consent === 'loading') {
+  if (splash && consent !== 'loading') {
+    content = <SplashScreen />;
+  } else if (consent === 'loading') {
     content = (
       <View style={styles.loading}>
         <ActivityIndicator color={colors.accent} />
