@@ -17,7 +17,8 @@ affiliated with its creators. The game is in English and intended for adults.
 ## Play
 
 Download the APK attached to the latest release (if any) or build it yourself (below), then install it on an
-Android phone (allow installation from unknown sources).
+Android phone (allow installation from unknown sources). APKs attached to GitHub releases are built without the
+background music, which is not redistributable.
 
 ## Privacy
 
@@ -48,6 +49,11 @@ the game builds and runs with telemetry disabled.
 Release signing reads `FACTORY_STORE_FILE`, `FACTORY_STORE_PASSWORD`, `FACTORY_KEY_ALIAS` and
 `FACTORY_KEY_PASSWORD` from your user-level `~/.gradle/gradle.properties`; without them the release build is
 signed with the debug key.
+
+## Licence
+
+The source code is under the MIT licence (`LICENSE`). The images in `assets/` are the author's artwork and are not
+offered under MIT; see [assets/LICENSES.md](assets/LICENSES.md).
 
 ## Project docs
 
