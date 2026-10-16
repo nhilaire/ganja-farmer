@@ -1,0 +1,9 @@
+{
+  "slug": "ganja-farmer",
+  "displayName": "Ganja Farmer",
+  "package": "io.github.nhilaire.ganjafarmer",
+  "stack": null,
+  "description": "Landscape arcade shooter: defend a field of plants from helicopters and paratroopers (remake of the 1998 freeware)",
+  "language": "fr-FR",
+  "factoryVersion": "1.0.0"
+}
