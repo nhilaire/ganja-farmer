@@ -5,6 +5,7 @@ import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 import { GameEngine } from './game/engine';
 import { HighScoreEntry, qualifies } from './game/highScores';
 import { makeLayout } from './game/layout';
+import { GameEvent } from './game/types';
 import { AboutScreen } from './screens/AboutScreen';
 import { ConsentScreen } from './screens/ConsentScreen';
 import { GameOverScreen } from './screens/GameOverScreen';
@@ -16,7 +17,8 @@ import { SPLASH_MS, SplashScreen } from './screens/SplashScreen';
 import { clearHighScores, loadHighScores, saveHighScore } from './storage/highScores';
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from './storage/settings';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
-import { applyConsent } from './telemetry/telemetry';
+import { telemetryFor, trackMapped } from './telemetry/gameTelemetry';
+import { applyConsent, track } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { colors } from './ui/theme';
 
@@ -62,14 +64,44 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
     setConsentState(value);
   }, []);
 
+  // STATS toggle in SETUP: the "off" event is the last one sent, the "on" event the first one after consent.
+  const toggleStats = useCallback(
+    async (granted: boolean) => {
+      if (!granted) track('settings_change', { setting: 'telemetry', value: 'off' });
+      await decide(granted);
+      if (granted) track('settings_change', { setting: 'telemetry', value: 'on' });
+    },
+    [decide],
+  );
+
   const play = useCallback(() => {
     engine.newGame();
+    track('game_start', { level: 1 });
     setRoute('game');
   }, [engine]);
 
   const home = useCallback(() => setRoute('home'), []);
 
+  const quit = useCallback(() => {
+    track('game_quit', { level: engine.level, duration_s: Math.round(engine.playTime) });
+    engine.paused = false;
+    setRoute('home');
+  }, [engine]);
+
+  const onGameEvents = useCallback(
+    (events: GameEvent[]) => {
+      for (const event of events) {
+        const tracked = telemetryFor(event, engine);
+        if (tracked) trackMapped(tracked);
+      }
+    },
+    [engine],
+  );
+
   const changeSettings = useCallback((patch: Partial<Settings>) => {
+    for (const [setting, on] of Object.entries(patch) as [keyof Settings, boolean][]) {
+      track('settings_change', { setting, value: on ? 'on' : 'off' });
+    }
     setSettings((current) => {
       const next = { ...current, ...patch };
       saveSettings(next).catch(() => {});
@@ -80,6 +112,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const resetScores = useCallback(async () => {
     await clearHighScores();
     setScores([]);
+    track('settings_change', { setting: 'reset_scores', value: 'done' });
   }, []);
 
   const gameOver = useCallback(() => {
@@ -113,7 +146,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   } else if (consent === 'unknown') {
     content = <ConsentScreen onDecision={decide} />;
   } else if (route === 'game') {
-    content = <GameScreen engine={engine} onGameOver={gameOver} onQuit={home} />;
+    content = <GameScreen engine={engine} onEvents={onGameEvents} onGameOver={gameOver} onQuit={quit} />;
   } else if (route === 'gameOver') {
     content = <GameOverScreen {...result} onSave={saveScore} onRetry={play} onMenu={home} />;
   } else if (route === 'scores') {
@@ -128,7 +161,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
         stats={consent === 'granted'}
         onSound={(sound) => changeSettings({ sound })}
         onVibration={(vibration) => changeSettings({ vibration })}
-        onStats={decide}
+        onStats={toggleStats}
         onResetScores={resetScores}
         onBack={home}
       />
