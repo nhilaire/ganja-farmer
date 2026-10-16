@@ -1,11 +1,11 @@
 # Release: Ganja Farmer v0.1.0
 
 Phone install: PASS
-User acceptance: pending
+User acceptance: confirmed (2026-10-16)
 Date: 2026-10-16
-Commit: e4cb484
-APK: ganja-farmer-0.1.0-arm64-v8a.apk (54 MB, arm64-v8a)
-SHA-256: a2c9f19789151c487e3e275ba70c67dd8f5f2aeb2a758d5d224fc25060a1cb1d
+Commit: 2a4a544
+APK: ganja-farmer-0.1.0-arm64-v8a.apk (56 MB, arm64-v8a)
+SHA-256: e41a170b243a141386fae4b93bf2501c91ca023f8010cef7b7ba684109890e20
 Signature: release signature valid
 Phone: Android 11 (API 30, arm64-v8a)
 Launch check: alive after 10 s, no fatal error
@@ -31,3 +31,5 @@ Launch check: alive after 10 s, no fatal error
   PLAN T-25).
 - 2026-10-16: the author supplied a background music track ("Rasta Rocket Man", own work): looped everywhere at 25 %,
   MUSIC toggle in SETUP (PRD amended, AC-42, PLAN T-26).
+- 2026-10-16, fifth phone test (build 2a4a544, arm64 56 MB): music, returning planes, sound, two-finger firing, icon and
+  feel checked by the user: accepted.

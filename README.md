@@ -4,6 +4,16 @@ A landscape arcade shooter for Android, made with React Native, Expo and Skia: d
 from helicopters, paratroopers, bombers, UFOs and bosses. A tribute to the 1998 freeware *Ganja Farmer*, not
 affiliated with its creators. The game is in English and intended for adults.
 
+## Screenshots
+
+<!-- factory:screenshots:start -->
+<p>
+  <img src="docs/screenshots/readme-1-home.png" width="240" alt="home">
+  <img src="docs/screenshots/readme-2-gameplay.png" width="240" alt="gameplay">
+  <img src="docs/screenshots/readme-3-game-over.png" width="240" alt="game over">
+</p>
+<!-- factory:screenshots:end -->
+
 ## Play
 
 Download the APK attached to the latest release (if any) or build it yourself (below), then install it on an
