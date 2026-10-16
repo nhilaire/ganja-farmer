@@ -6,9 +6,9 @@ import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
 
-type Props = { bestScore: number; onPlay: () => void; onSettings: () => void; onAbout: () => void };
+type Props = { onPlay: () => void; onSettings: () => void; onAbout: () => void };
 
-export function HomeScreen({ bestScore, onPlay, onSettings, onAbout }: Props) {
+export function HomeScreen({ onPlay, onSettings, onAbout }: Props) {
   return (
     <Screen testID="home-screen">
       <View style={styles.hero}>

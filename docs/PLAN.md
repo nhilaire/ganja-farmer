@@ -21,8 +21,8 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-11 Game session: level progression, bonus, Jah draw, single plant state D1, pause freeze, cheats, play time (AC-16, AC-17, AC-38, AC-28, AC-31) - proof: unit
 
 ### Screens
-- [ ] T-12 Skia renderer port and Game screen: canvas, touch aim/fire, HUD, pause overlay, messages (AC-08, AC-26) - proof: unit
-- [ ] T-13 Jah blessing overlay and level transition screen (AC-22) - proof: unit
+- [x] T-12 Skia renderer port and Game screen: canvas, touch aim/fire, HUD, pause overlay, messages (AC-08, AC-26) - proof: unit
+- [x] T-13 Jah blessing overlay and level transition screen (AC-22) - proof: unit
 - [ ] T-14 High scores storage, game over screen with name entry, SCORES table, home idle display (AC-23, AC-24, AC-25, AC-33) - proof: unit
 - [ ] T-15 Home screen port (AC-07) - proof: unit
 - [ ] T-16 Source assets (icon, adaptive icon, splash), landscape + fullscreen config plugin, custom 2 s splash (AC-06, AC-34) - proof: unit

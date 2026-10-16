@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 
+import { GameEngine } from './game/engine';
+import { makeLayout } from './game/layout';
 import { AboutScreen } from './screens/AboutScreen';
 import { ConsentScreen } from './screens/ConsentScreen';
 import { GameScreen } from './screens/GameScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
-import { loadBestScore, saveBestScore } from './storage/bestScore';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { applyConsent } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
@@ -17,17 +18,18 @@ type Route = 'home' | 'game' | 'settings' | 'about';
 export default function App() {
   const [consent, setConsentState] = useState<Consent | 'loading'>('loading');
   const [route, setRoute] = useState<Route>('home');
-  const [bestScore, setBestScore] = useState(0);
+  // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
+  const engine = useMemo(() => {
+    const { width, height } = Dimensions.get('screen');
+    return new GameEngine(makeLayout(width, height), Math.random);
+  }, []);
 
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [storedConsent, storedBest] = await Promise.all([loadConsent(), loadBestScore()]);
+      const storedConsent = await loadConsent();
       if (storedConsent !== 'unknown') await applyConsent(storedConsent === 'granted');
-      if (alive) {
-        setConsentState(storedConsent);
-        setBestScore(storedBest);
-      }
+      if (alive) setConsentState(storedConsent);
     })();
     return () => {
       alive = false;
@@ -41,10 +43,10 @@ export default function App() {
     setConsentState(value);
   }, []);
 
-  const onGameOver = useCallback(async (score: number) => {
-    setBestScore((current) => Math.max(current, score));
-    await saveBestScore(score);
-  }, []);
+  const play = useCallback(() => {
+    engine.newGame();
+    setRoute('game');
+  }, [engine]);
 
   let content: React.ReactNode;
   if (consent === 'loading') {
@@ -56,13 +58,13 @@ export default function App() {
   } else if (consent === 'unknown') {
     content = <ConsentScreen onDecision={decide} />;
   } else if (route === 'game') {
-    content = <GameScreen onExit={() => setRoute('home')} onGameOver={onGameOver} />;
+    content = <GameScreen engine={engine} onGameOver={() => setRoute('home')} onQuit={() => setRoute('home')} />;
   } else if (route === 'about') {
     content = <AboutScreen onBack={() => setRoute('home')} />;
   } else if (route === 'settings') {
     content = <SettingsScreen telemetryEnabled={consent === 'granted'} onToggleTelemetry={decide} onBack={() => setRoute('home')} />;
   } else {
-    content = <HomeScreen bestScore={bestScore} onPlay={() => setRoute('game')} onSettings={() => setRoute('settings')} onAbout={() => setRoute('about')} />;
+    content = <HomeScreen onPlay={play} onSettings={() => setRoute('settings')} onAbout={() => setRoute('about')} />;
   }
 
   return <ErrorBoundary>{content}</ErrorBoundary>;
