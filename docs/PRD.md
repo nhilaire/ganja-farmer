@@ -477,7 +477,7 @@ phone, `[manual]` human judgement (kept rare).
 - AC-41 [unit] Given an A-10 or a crop duster that leaves the screen alive, then it is not drawn nor hittable while
   away, the level does not complete, and it comes back after 5-10 s (at most 2 s once the quota is reached) from a
   random side with the same HP and a new pass (A-10: 1-2 new bombs; crop duster: 5 new attacks) (D6).
-- AC-42 [unit] Given MUSIC on (default), then the background music loops at volume 0.25 from app start; it pauses
+- AC-42 [unit] Given the track bundled (author's local build) and MUSIC on (default), then the background music loops at volume 0.25 from app start; it pauses
   when the app leaves the foreground and resumes on return; MUSIC off stops it and the choice survives a restart;
   SOUND off does not stop the music.
 - AC-15 [unit] Given kills, then each enemy adds its score, air kills by bullets within 2.0 s build a combo with
