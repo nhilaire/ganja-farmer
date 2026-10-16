@@ -6,7 +6,7 @@ Final app name: Ganja Farmer
 Android package: io.github.nhilaire.ganjafarmer
 Version target: 0.1.0
 Player language: en-US (`factory-app.json` `language`)
-Last updated: 2026-10-16
+Last updated: 2026-10-16 (AC-06, AC-07, AC-22 amended with the user after the first verification)
 
 > Written in English. **Player-facing strings are in English too** (user's decision, an exception to the factory's
 > French default); they are quoted in the "Player-facing copy" section.
@@ -82,11 +82,12 @@ flowchart LR
 ```
 
 - **Splash:** the native splash (black background) is followed by the source landscape splash image
-  (`splash-icon.png`, "GANJA FARMER" logo) shown for 2 s, covering the screen.
+  (`splash-icon.png`, "GANJA FARMER" logo) shown for 2 s, whole (letterboxed on black, never cropped).
 - **Consent** (first launch only, also reachable through the STATS toggle): explains the anonymous statistics,
   with two buttons of equal size and prominence (accept / refuse). The game is fully playable either way.
-- **Home:** "GANJA" / "FARMER" title, subtitle, PLAY button, the 3 control hints, and the leaf buttons SCORES,
-  ABOUT and SETUP. After 30 s without a touch, and if at least one high score exists, the high-score table is shown.
+- **Home:** "GANJA" / "FARMER" title, subtitle, PLAY button, the 3 control hints, and the leaf buttons SCORES
+  (always shown; an empty table says "No scores yet, Rasta!"), ABOUT and SETUP. After 30 s without a touch, and if
+  at least one high score exists, the high-score table is shown.
   A tap on it, or 30 s, brings back the home screen.
 - **High scores:** top 10 with columns #, NAME, SCORE, LVL, KILLS. The first row is highlighted. "Tap to go back".
 - **Game:** a Skia canvas with code-drawn graphics: sky, plants, van and rasta, enemies, bullets, explosions,
@@ -426,10 +427,11 @@ phone, `[manual]` human judgement (kept rare).
   (no name, no free text).
 - AC-05 [device] Given consent was accepted, when a scripted game runs on the emulator, then `game_start`,
   `level_complete` and `game_over` appear in logcat (`Logging event`).
-- AC-06 [e2e] Given a cold launch, when the app starts, then the splash image with the "GANJA FARMER" logo is shown
-  for about 2 s, in landscape and fullscreen, then the next screen appears.
+- AC-06 [e2e] Given a cold launch, when the app starts, then the whole splash image with the "GANJA FARMER"
+  logo (not cropped, black bars if needed) is shown for about 2 s, in landscape and fullscreen, then the next screen
+  appears.
 - AC-07 [e2e] Given the home screen, then it shows the GANJA FARMER title, "Defend your field, Rasta!", PLAY, the
-  3 control hints, SCORES, ABOUT and SETUP.
+  3 control hints, SCORES (even before any score), ABOUT and SETUP.
 - AC-08 [e2e] Given the home screen, when PLAY is tapped, then the game screen shows the HUD
   (`Score: 0000000`, `Level: 01`, `Plants: 26/26`, `[Pistol]`) and a pause button.
 - AC-09 [unit] Given firing is on with aim angle a, when time advances, then bullets are created at the weapon's
@@ -474,7 +476,7 @@ phone, `[manual]` human judgement (kept rare).
   start, while shields, trap charges and wall carry over to the next level until used (D5).
 - AC-21 [unit] Given a game, when the last live plant is destroyed, then the game-over callback fires exactly once.
 - AC-22 [e2e] Given a game with all 26 plants alive, when the skip-level cheat is used, then the level
-  transition screen shows "LEVEL 02", the bonus "+1000 pts", a quote and "Tap to continue", and no
+  transition screen shows "LEVEL 2", the bonus "+1000 pts", a quote and "Tap to continue", and no
   "Plants Restored" line. A tap returns to the game at level 2.
 - AC-23 [e2e] Given a game lost with a qualifying score, when the game-over screen appears, then it shows score,
   kills and level, "NEW HIGH SCORE!" and a name field. After SAVE, "Score saved!" is shown and the entry appears in

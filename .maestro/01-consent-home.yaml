@@ -35,6 +35,9 @@ tags:
 - assertVisible: "Defend your field, Rasta!"
 - assertVisible: "PLAY"
 - assertVisible: "Touch screen to aim and shoot"
+- assertVisible: "Hold to fire continuously"
+- assertVisible: "Protect your ganja plants!"
+- assertVisible: "SCORES"
 - assertVisible: "ABOUT"
 - assertVisible: "SETUP"
 - takeScreenshot: 03-home

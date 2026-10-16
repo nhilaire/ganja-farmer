@@ -75,5 +75,7 @@ tags:
     id: "setup-back"
 - assertVisible:
     id: "home-screen"
-- assertNotVisible:
+- tapOn:
     id: "home-scores"
+- assertVisible: "No scores yet, Rasta!"
+- assertNotVisible: "IRIE"

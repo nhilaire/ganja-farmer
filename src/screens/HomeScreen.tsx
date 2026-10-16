@@ -1,4 +1,5 @@
-// Title screen ported from the source `components/MainMenu.tsx`: title, PLAY, control hints and leaf buttons.
+// Title screen ported from the source `components/MainMenu.tsx`: title, PLAY, control hints and leaf buttons
+// (SCORES is always shown, unlike the source: decided with the user at the first verification).
 // After 30 s without a touch, and if a high score exists, the high-score table is shown (onScores).
 import { useCallback, useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -61,7 +62,7 @@ export function HomeScreen({ hasScores, onPlay, onScores, onAbout, onSetup }: Pr
         </View>
       </View>
       <View style={styles.leafMenu}>
-        {hasScores && <LeafButton label={en.home.scores} onPress={onScores} testID="home-scores" />}
+        <LeafButton label={en.home.scores} onPress={onScores} testID="home-scores" />
         <LeafButton label={en.home.about} onPress={onAbout} testID="home-about" />
         <LeafButton label={en.home.setup} onPress={onSetup} testID="home-setup" />
       </View>

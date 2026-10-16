@@ -43,6 +43,8 @@ describe('App', () => {
     jest.useFakeTimers();
     await render(<App />);
     expect(await screen.findByTestId('splash-screen')).toBeTruthy();
+    // The whole artwork, letterboxed on black: the logo is never cropped on long screens.
+    expect(screen.getByTestId('splash-image').props.resizeMode).toBe('contain');
     expect(screen.queryByText('Help the farm grow?')).toBeNull();
     await act(async () => {
       jest.advanceTimersByTime(2000);

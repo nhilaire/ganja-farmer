@@ -53,6 +53,8 @@ describe('setup screen (AC-29, AC-30)', () => {
     expect(await AsyncStorage.getItem('highScores.v1')).toBeNull();
     await fireEvent.press(screen.getByText('BACK'));
     expect(await screen.findByText('PLAY')).toBeTruthy();
-    expect(screen.queryByText('SCORES')).toBeNull();
+    await fireEvent.press(screen.getByText('SCORES'));
+    expect(screen.getByText('No scores yet, Rasta!')).toBeTruthy();
+    expect(screen.queryByText('IRIE')).toBeNull();
   });
 });

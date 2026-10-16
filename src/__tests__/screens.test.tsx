@@ -26,9 +26,9 @@ describe('home screen (AC-07, AC-33)', () => {
     }
   });
 
-  it('hides SCORES when there is no score', async () => {
+  it('shows SCORES even before any score (AC-07)', async () => {
     await render(<HomeScreen hasScores={false} onPlay={noop} onScores={noop} onAbout={noop} onSetup={noop} />);
-    expect(screen.queryByText('SCORES')).toBeNull();
+    expect(screen.getByText('SCORES')).toBeTruthy();
   });
 
   it('shows the scores after 30 s without a touch, only if a score exists', async () => {
@@ -48,6 +48,11 @@ describe('home screen (AC-07, AC-33)', () => {
 });
 
 describe('high scores table (AC-33)', () => {
+  it('says so when the table is empty', async () => {
+    await render(<HighScoresScreen scores={[]} onBack={noop} />);
+    expect(screen.getByText('No scores yet, Rasta!')).toBeTruthy();
+  });
+
   beforeEach(() => {
     jest.useFakeTimers();
   });
