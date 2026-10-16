@@ -41,6 +41,7 @@ tags:
 - assertVisible: "ABOUT"
 - assertVisible: "SETUP"
 - takeScreenshot: 03-home
+- takeScreenshot: readme-1-home
 # AC-02: the choice is remembered.
 - stopApp
 - launchApp

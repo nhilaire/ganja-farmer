@@ -32,6 +32,7 @@ tags:
 - evalScript: ${(function () { var t = Date.now(); while (Date.now() - t < 4000) {} })()}
 - assertVisible: "NEW HIGH SCORE!"
 - takeScreenshot: 08-game-over
+- takeScreenshot: readme-3-game-over
 - tapOn:
     id: "gameover-name"
 - inputText: "IRIE"

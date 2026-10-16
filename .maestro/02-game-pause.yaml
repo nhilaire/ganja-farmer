@@ -29,6 +29,7 @@ tags:
     timeout: 6000
     optional: true
 - takeScreenshot: 04-game
+- takeScreenshot: readme-2-gameplay
 # AC-26: pause overlay with RESUME and MENU.
 - tapOn:
     id: "game-pause"
