@@ -2,22 +2,28 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 
 import { GameEngine } from './game/engine';
+import { HighScoreEntry, qualifies } from './game/highScores';
 import { makeLayout } from './game/layout';
 import { AboutScreen } from './screens/AboutScreen';
 import { ConsentScreen } from './screens/ConsentScreen';
+import { GameOverScreen } from './screens/GameOverScreen';
 import { GameScreen } from './screens/GameScreen';
+import { HighScoresScreen } from './screens/HighScoresScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { loadHighScores, saveHighScore } from './storage/highScores';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { applyConsent } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { colors } from './ui/theme';
 
-type Route = 'home' | 'game' | 'settings' | 'about';
+type Route = 'home' | 'scores' | 'game' | 'gameOver' | 'setup' | 'about';
 
 export default function App() {
   const [consent, setConsentState] = useState<Consent | 'loading'>('loading');
   const [route, setRoute] = useState<Route>('home');
+  const [scores, setScores] = useState<HighScoreEntry[]>([]);
+  const [result, setResult] = useState({ score: 0, kills: 0, level: 1, isHighScore: false });
   // One engine for the app lifetime; a new game resets it. Layout from the landscape screen size.
   const engine = useMemo(() => {
     const { width, height } = Dimensions.get('screen');
@@ -27,9 +33,12 @@ export default function App() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const storedConsent = await loadConsent();
+      const [storedConsent, storedScores] = await Promise.all([loadConsent(), loadHighScores()]);
       if (storedConsent !== 'unknown') await applyConsent(storedConsent === 'granted');
-      if (alive) setConsentState(storedConsent);
+      if (alive) {
+        setScores(storedScores);
+        setConsentState(storedConsent);
+      }
     })();
     return () => {
       alive = false;
@@ -48,6 +57,21 @@ export default function App() {
     setRoute('game');
   }, [engine]);
 
+  const home = useCallback(() => setRoute('home'), []);
+
+  const gameOver = useCallback(() => {
+    setResult({ score: engine.score, kills: engine.kills, level: engine.level, isHighScore: qualifies(scores, engine.score) });
+    setRoute('gameOver');
+  }, [engine, scores]);
+
+  const saveScore = useCallback(
+    async (name: string) => {
+      const entry = { name, score: result.score, level: result.level, kills: result.kills, date: new Date().toISOString() };
+      setScores(await saveHighScore(entry));
+    },
+    [result],
+  );
+
   let content: React.ReactNode;
   if (consent === 'loading') {
     content = (
@@ -58,13 +82,25 @@ export default function App() {
   } else if (consent === 'unknown') {
     content = <ConsentScreen onDecision={decide} />;
   } else if (route === 'game') {
-    content = <GameScreen engine={engine} onGameOver={() => setRoute('home')} onQuit={() => setRoute('home')} />;
+    content = <GameScreen engine={engine} onGameOver={gameOver} onQuit={home} />;
+  } else if (route === 'gameOver') {
+    content = <GameOverScreen {...result} onSave={saveScore} onRetry={play} onMenu={home} />;
+  } else if (route === 'scores') {
+    content = <HighScoresScreen scores={scores} onBack={home} />;
   } else if (route === 'about') {
-    content = <AboutScreen onBack={() => setRoute('home')} />;
-  } else if (route === 'settings') {
-    content = <SettingsScreen telemetryEnabled={consent === 'granted'} onToggleTelemetry={decide} onBack={() => setRoute('home')} />;
+    content = <AboutScreen onBack={home} />;
+  } else if (route === 'setup') {
+    content = <SettingsScreen telemetryEnabled={consent === 'granted'} onToggleTelemetry={decide} onBack={home} />;
   } else {
-    content = <HomeScreen onPlay={play} onSettings={() => setRoute('settings')} onAbout={() => setRoute('about')} />;
+    content = (
+      <HomeScreen
+        hasScores={scores.length > 0}
+        onPlay={play}
+        onScores={() => setRoute('scores')}
+        onAbout={() => setRoute('about')}
+        onSetup={() => setRoute('setup')}
+      />
+    );
   }
 
   return <ErrorBoundary>{content}</ErrorBoundary>;

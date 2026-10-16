@@ -37,5 +37,6 @@ jest.mock('@shopify/react-native-skia', () => {
     createPicture: () => ({}),
     Canvas: ({ children, style }) => React.createElement(View, { style, testID: 'skia-canvas' }, children),
     Picture: () => null,
+    Path: () => null,
   };
 });
