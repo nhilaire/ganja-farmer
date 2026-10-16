@@ -1,6 +1,6 @@
 import { Canvas, createPicture, Picture } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppState, BackHandler, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CheatDetector } from '../game/cheats';
 import { GameEngine } from '../game/engine';
@@ -23,8 +23,6 @@ type Props = {
   onEvents?: (events: GameEvent[]) => void; // sounds, vibrations, telemetry
   onGameOver: () => void;
   onQuit: () => void;
-  // Incremented by the app when it leaves the foreground: the game pauses itself.
-  pauseSignal?: number;
 };
 
 const MAX_DT = 0.05; // clamp long frames (app resumed, GC pause) to keep the simulation stable
@@ -33,7 +31,7 @@ function pickQuote(): string {
   return JAH_QUOTES[Math.floor(Math.random() * JAH_QUOTES.length)];
 }
 
-export function GameScreen({ engine, onEvents, onGameOver, onQuit, pauseSignal = 0 }: Props) {
+export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
   const [, setFrame] = useState(0);
   const [paused, setPaused] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' });
@@ -124,9 +122,13 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit, pauseSignal =
     setPaused(false);
   }, [engine]);
 
+  // Leaving the app (call, notification, home button) pauses the game; it never resumes by itself.
   useEffect(() => {
-    if (pauseSignal > 0 && engine.phase !== 'over') pause();
-  }, [pauseSignal, engine, pause]);
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active' && engine.phase !== 'over') pause();
+    });
+    return () => sub.remove();
+  }, [engine, pause]);
 
   // Android back opens the pause overlay instead of leaving the game.
   useEffect(() => {

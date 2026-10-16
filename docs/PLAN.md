@@ -28,7 +28,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-16 Source assets (icon, adaptive icon, splash), landscape + fullscreen config plugin, custom 2 s splash (AC-06, AC-34) - proof: unit
 - [x] T-17 Setup screen: sound, vibration, stats toggles, reset high scores with confirmation, persisted settings (AC-29, AC-30) - proof: unit
 - [x] T-18 About screen: original game, story, this version, version, quote (AC-32) - proof: unit
-- [ ] T-19 Auto-pause when the app leaves the foreground (AC-27) - proof: unit
+- [x] T-19 Auto-pause when the app leaves the foreground (AC-27) - proof: unit
 
 ### Factory layer and polish
 - [ ] T-20 Telemetry calls for the 6 PRD events, cause tracking, consent gating (AC-03, AC-04, AC-05) - proof: unit

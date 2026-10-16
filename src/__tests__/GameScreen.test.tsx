@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { AppState } from 'react-native';
 
 import { GameScreen } from '../screens/GameScreen';
 import { fixedEngine } from '../test-utils/engine';
@@ -47,12 +48,22 @@ describe('GameScreen', () => {
     expect(onQuit).toHaveBeenCalledTimes(1);
   });
 
-  it('pauses itself when the app signals it went to the background', async () => {
+  it('pauses itself when the app leaves the foreground, and stays paused (AC-27)', async () => {
+    const listeners: ((state: string) => void)[] = [];
+    jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+      listeners.push(listener as (state: string) => void);
+      return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;
+    });
     const { engine, onQuit, onGameOver } = setup();
-    const view = await render(<GameScreen engine={engine} onQuit={onQuit} onGameOver={onGameOver} pauseSignal={0} />);
-    await view.rerender(<GameScreen engine={engine} onQuit={onQuit} onGameOver={onGameOver} pauseSignal={1} />);
+    await render(<GameScreen engine={engine} onQuit={onQuit} onGameOver={onGameOver} />);
+    await advance(500);
+    const t = engine.playTime;
+    await act(async () => listeners.forEach((l) => l('background')));
     expect(screen.getByText('PAUSED')).toBeTruthy();
-    expect(engine.paused).toBe(true);
+    await act(async () => listeners.forEach((l) => l('active')));
+    await advance(2000);
+    expect(screen.getByText('PAUSED')).toBeTruthy();
+    expect(engine.playTime).toBeCloseTo(t, 5);
   });
 
   it('aims and fires while the finger is down', async () => {
