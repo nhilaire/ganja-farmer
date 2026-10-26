@@ -6,10 +6,12 @@ tags:
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Help the farm grow?"
+    visible:
+      id: "consent-screen"
     timeout: 15000
 - tapOn:
     id: "consent-refuse"
+- runFlow: helpers/english.yaml
 - tapOn:
     id: "home-play"
 - assertVisible:

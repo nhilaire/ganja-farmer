@@ -6,10 +6,12 @@ tags:
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Help the farm grow?"
+    visible:
+      id: "consent-screen"
     timeout: 15000
 - tapOn:
     id: "consent-refuse"
+- runFlow: helpers/english.yaml
 - tapOn:
     id: "home-play"
 # A qualifying score: the skip-level cheat gives the level-1 bonus (1000 points).
@@ -32,7 +34,6 @@ tags:
 - evalScript: ${(function () { var t = Date.now(); while (Date.now() - t < 4000) {} })()}
 - assertVisible: "NEW HIGH SCORE!"
 - takeScreenshot: 08-game-over
-- takeScreenshot: readme-3-game-over
 - tapOn:
     id: "gameover-name"
 - inputText: "IRIE"

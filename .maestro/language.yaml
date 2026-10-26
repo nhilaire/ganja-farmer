@@ -1,0 +1,63 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Language - switch from SETUP, the whole UI follows at once and the choice survives a restart (AC-44)
+tags:
+  - language
+---
+- launchApp:
+    clearState: true
+# Android shows a one-time "Viewing full screen" tip on a fresh device: dismiss it if present.
+- tapOn:
+    text: "Got it"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "consent-screen"
+    timeout: 15000
+- tapOn:
+    id: "consent-refuse"
+- tapOn:
+    id: "home-setup"
+- scrollUntilVisible:
+    element:
+      id: "settings-language-en"
+- tapOn:
+    id: "settings-language-en"
+- assertVisible: "SETUP"
+- assertVisible: "SOUND"
+- takeScreenshot: language-en-setup
+- tapOn:
+    id: "settings-language-fr"
+- assertVisible: "RÉGLAGES"
+- assertVisible: "SON"
+- takeScreenshot: language-fr-setup
+- tapOn:
+    id: "setup-back"
+- assertVisible: "JOUER"
+# French no-break spaces are matched with "." (Maestro texts are regular expressions).
+- assertVisible: "Défends ton champ, Rasta.!"
+- tapOn:
+    id: "home-play"
+- assertVisible: "Niveau.: 01"
+- assertVisible: "Plants.: 26/26"
+- assertVisible: "\\[Pistolet\\]"
+- takeScreenshot: language-fr-game
+- stopApp
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible:
+      id: "home-screen"
+    timeout: 15000
+- assertVisible: "JOUER"
+- tapOn:
+    id: "home-setup"
+- scrollUntilVisible:
+    element:
+      id: "settings-language-auto"
+- tapOn:
+    id: "settings-language-auto"
+- tapOn:
+    id: "settings-language-en"
+- tapOn:
+    id: "setup-back"
+- assertVisible: "PLAY"

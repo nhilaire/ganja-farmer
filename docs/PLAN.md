@@ -41,7 +41,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-25 Returning A-10s and crop dusters until destroyed, faster once the quota is reached (AC-41, D6) - proof: unit
 - [x] T-26 Background music looped at 25 %, MUSIC toggle in SETUP, pause in background (AC-42, AC-29) - proof: unit
 - [x] T-27 Language core and French: i18n index (English reference), Strings type, I18nProvider, expo-localization, language setting store, French dictionary (typography, plurals), SETUP language choice, canvas texts per language, app wiring, launcher name (AC-34, AC-43, AC-45) - proof: unit
-- [ ] T-28 Maestro: flows pin English through SETUP, language flow with screenshots, readme-3 capture on the level transition (AC-44) - proof: e2e
+- [x] T-28 Maestro: flows pin English through SETUP, language flow with screenshots, readme-3 capture on the level transition (AC-44) - proof: e2e
 
 ## Notes
 

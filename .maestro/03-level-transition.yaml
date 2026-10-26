@@ -6,10 +6,12 @@ tags:
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Help the farm grow?"
+    visible:
+      id: "consent-screen"
     timeout: 15000
 - tapOn:
     id: "consent-refuse"
+- runFlow: helpers/english.yaml
 - tapOn:
     id: "home-play"
 - assertVisible: "Level: 01"
@@ -27,6 +29,7 @@ tags:
     visible: "Tap to continue"
     timeout: 5000
 - takeScreenshot: 06-level-transition
+- takeScreenshot: readme-3-level-transition
 - tapOn: "Tap to continue"
 - extendedWaitUntil:
     visible: "Level: 02"

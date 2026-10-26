@@ -1,0 +1,14 @@
+appId: io.github.nhilaire.ganjafarmer
+name: Helper - pin the game in English from Home (flows assert English texts whatever the emulator's language)
+---
+- tapOn:
+    id: "home-setup"
+- scrollUntilVisible:
+    element:
+      id: "settings-language-en"
+- tapOn:
+    id: "settings-language-en"
+- tapOn:
+    id: "setup-back"
+- assertVisible:
+    id: "home-screen"
