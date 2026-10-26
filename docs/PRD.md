@@ -4,12 +4,12 @@ Status: approved
 Project slug: ganja-farmer
 Final app name: Ganja Farmer
 Android package: io.github.nhilaire.ganjafarmer
-Version target: 0.1.0
-Player language: en-US (`factory-app.json` `language`)
-Last updated: 2026-10-16 (with the user: AC-06/07/22 amended after verification; AC-40, AC-41 (D6), AC-42 (music) and APK size after the phone tests)
+Version target: 0.2.0
+Player languages: English (reference) and French (v0.2.0, `factory-app.json` `languages`)
+Last updated: 2026-10-26 (v0.2.0: French added; before: 2026-10-16, with the user: AC-06/07/22 amended after verification; AC-40, AC-41 (D6), AC-42 (music) and APK size after the phone tests)
 
-> Written in English. **Player-facing strings are in English too** (user's decision, an exception to the factory's
-> French default); they are quoted in the "Player-facing copy" section.
+> Written in English. **Player-facing strings are in English (the reference, user's decision) and French (v0.2.0)**;
+> they are quoted in the "Player copy" section.
 > Status becomes `approved` only after the user explicitly approves this document.
 
 ## Summary
@@ -105,7 +105,8 @@ flowchart LR
 - **Game over:** "GAME OVER", then `Score: 0000000`, `Kills: n`, `Level: n`. The buttons appear after 3 s.
   On a top-10 score: "NEW HIGH SCORE!", a name field (max 12 characters) and SAVE, then "Score saved!".
   RETRY and MENU.
-- **Setup:** toggles for SOUND, MUSIC, VIBRATION and STATS, plus a RESET HIGH SCORES button with a confirmation dialog.
+- **Setup:** toggles for SOUND, MUSIC, VIBRATION and STATS, plus a RESET HIGH SCORES button with a confirmation dialog,
+  and LANGUAGE: « AUTO (PHONE) », « English », « Français » (v0.2.0).
   BACK.
 - **About:** "The Original Game" (source text), "Why this game" (the story from the brief), "This Version"
   (tribute, not affiliated, made by a passionate independent developer), "Built with" (React Native, Expo, Skia),
@@ -350,6 +351,21 @@ Level multipliers: `speedMult = 1 + 0.10 (L - 1)`, `hpMult = 1 + 0.05 (L - 1)`, 
   bombs, a crop duster gets its 5 attacks back (and a new D4 pass). Jah Lightning and One Drop only affect planes on
   screen. UFOs still cross once.
 
+## Languages (v0.2.0)
+
+- Languages: English (reference, the original game's language) and French; fallback English. Resolution: explicit
+  choice in SETUP, else the first supported language of the phone's language list, else English. The phone's
+  language is read again when the app comes back to the foreground.
+- The language switch is immediate (no restart) and saved locally; « AUTO » goes back to following the phone. A game
+  in progress is not touched.
+- Every player-facing text follows the game's language, including the two texts drawn on the game canvas (combo,
+  boss warning), except, as decided by the user: the 34 Jah quotes of the level transition and the Bob Marley quote
+  of ABOUT stay in their English original, and the power-up names (RASTA POWER, ONE DROP…, often reggae song titles)
+  stay in English while their descriptions are translated. « Rasta », « Jah », « Babylon » stay as they are.
+- Launcher name: « Ganja Farmer » in every language (decided by the user).
+- French: « tu » tone, arcade capitals kept, French typography (no-break space before « : ; ! ? % »); plural
+  « 1 plant restauré » / « {n} plants restaurés ». High-score names entered by players are kept as typed.
+
 ## Look, sound and feel
 
 - **Orientation and screen:** landscape locked, fullscreen immersive (status and navigation bars hidden, as in
@@ -526,64 +542,92 @@ phone, `[manual]` human judgement (kept rare).
 - AC-33 [e2e] Given the home screen with at least one high score, when nothing is touched for 30 s, then the
   high-score table is shown, and a tap returns to the home screen.
 - AC-34 [device] Given the release APK installed, then the launcher shows the source icon and the name
-  "Ganja Farmer", and the app runs in landscape fullscreen.
+  "Ganja Farmer" (in every language, v0.2.0: `aapt dump badging` label « Ganja Farmer » by default, en and fr), and the
+  app runs in landscape fullscreen.
 - AC-35 [device] Given the release build on the emulator, when the cold start is measured, then it is < 3 s.
 - AC-36 [device] Given the Maestro flows run on the release build, then logcat shows no crash and no ANR for the
   app.
+- AC-43 [unit] Given the dictionaries, then English and French have exactly the same keys and shapes, French is really
+  translated (except the quotes and power-up names kept in English by decision), no text is empty, the languages
+  match `factory-app.json`; given the setting « auto » and phone languages [en-US] / [fr-FR] / [it-IT, fr-FR] /
+  [it-IT], then the game is in English / French / French / English; an explicit choice wins; French texts follow
+  French typography; « +1 plant restauré », « +3 plants restaurés ».
+- AC-44 [e2e] Given SETUP, when « Français » is tapped, then the whole UI switches at once (« RÉGLAGES », « SON »),
+  the home screen shows « JOUER » and « Défends ton champ, Rasta ! »; after a restart it is still French; when
+  « AUTO » then « English » are tapped, then the home screen shows « PLAY ». Screenshots `language-en-setup`,
+  `language-fr-setup`, `language-fr-game`.
+- AC-45 [manual] Given the release APK on the user's phone in French, when a few levels are played, then the user
+  confirms the French texts (home, HUD, power-up descriptions, level transition, game over, setup, about).
 - AC-37 [manual] Given the APK on the user's phone, when the user plays a few levels, then the game feels like the
   source game (same pace, weapons, enemies, Jah, bosses), sound effects fit and play is smooth.
 
-## Player-facing copy
+## Player copy
 
-English, casual tone with rasta winks. Kept from the source unless marked new. All strings live in the i18n module.
+English: casual tone with rasta winks, kept from the source unless marked new. French (v0.2.0): same tone, « tu »,
+French typography (no-break spaces, shown as plain spaces below). Language names in SETUP are written in their own
+language (« English », « Français »). Final app name (launcher): « Ganja Farmer » in both languages. All strings live
+in the i18n module (`src/i18n/en.ts` reference, `fr.ts`).
 
-| Key | English text |
-|---|---|
-| home.title | GANJA / FARMER |
-| home.subtitle | Defend your field, Rasta! |
-| home.play | PLAY |
-| home.hint1 | Touch screen to aim and shoot |
-| home.hint2 | Hold to fire continuously |
-| home.hint3 | Protect your ganja plants! |
-| home.scores / home.about / home.setup | SCORES / ABOUT / SETUP |
-| scores.title | HIGH SCORES |
-| scores.columns | # / NAME / SCORE / LVL / KILLS |
-| scores.back | Tap to go back |
-| hud.score / hud.level / hud.plants | Score: {score7} / Level: {level2} / Plants: {alive}/26 |
-| pause.title / pause.resume / pause.menu | PAUSED / RESUME / MENU |
-| game.bossIncoming | BOSS INCOMING: {name} |
-| game.combo | x{n} COMBO! (and x{multiplier, 1 decimal}) |
-| game.rocketMessage | Rasta rocket mon ! |
-| blessing.restored | +{n} Plants Restored |
-| transition.level | LEVEL {n} |
-| transition.bonus | +{bonus} pts |
-| transition.newWeapon | New Weapon: {weapon}! |
-| transition.continue | Tap to continue |
-| gameover.title | GAME OVER |
-| gameover.stats | Score: {score7} / Kills: {kills} / Level: {level} |
-| gameover.newRecord | NEW HIGH SCORE! |
-| gameover.namePlaceholder | Your name, Rasta (new) |
-| gameover.save / gameover.saved | SAVE / Score saved! |
-| gameover.retry / gameover.menu | RETRY / MENU |
-| consent.title | Help the farm grow? (new) |
-| consent.body | Share anonymous game statistics (levels reached, game length, crashes) to help improve Ganja Farmer. No name, no ID, no ads. You can change this anytime in SETUP. (new) |
-| consent.accept / consent.refuse | YES, SHARE STATS / NO THANKS (new) |
-| setup.title | SETUP |
-| setup.sound / setup.music / setup.vibration / setup.stats | SOUND / MUSIC / VIBRATION / STATS (new) |
-| setup.on / setup.off | ON / OFF (new) |
-| setup.reset | RESET HIGH SCORES (new) |
-| setup.resetConfirm | Erase all high scores, Rasta? (new) |
-| setup.resetYes / setup.resetNo | ERASE / CANCEL (new) |
-| common.back | BACK |
-| about.title | ABOUT |
-| about.original | The Original Game (source text, 3 paragraphs) |
-| about.whyTitle | Why this game (new) |
-| about.story | I played Ganja Farmer for hours as a teenager, on the family computer, found in a folder of downloaded freeware games. I made this version to bring it back on my phone - a tribute by a passionate independent developer, not affiliated with the original creators. |
-| about.version | Version {version} (new) |
-| about.quote | "One good thing about music, when it hits you, you feel no pain." - Bob Marley |
-| weapons | Pistol / Machine Gun / 20mm AA Gun / Rocket Launcher / Gatling / Laser Cannon (English names, new) |
-| powerups | names and descriptions as in the power-up table of the source (`RASTA POWER` / `x2 Damage 15s`, ...) |
-| quotes | the 34 Jah messages of the source level transition, unchanged |
+| Key | en | fr |
+|---|---|---|
+| home.title | GANJA / FARMER | GANJA / FARMER |
+| home.subtitle | Defend your field, Rasta! | Défends ton champ, Rasta ! |
+| home.play | PLAY | JOUER |
+| home.hint1 | Touch screen to aim and shoot | Touche l'écran pour viser et tirer |
+| home.hint2 | Hold to fire continuously | Garde le doigt appuyé pour tirer en continu |
+| home.hint3 | Protect your ganja plants! | Protège tes plants de ganja ! |
+| home.scores / home.about / home.setup | SCORES / ABOUT / SETUP | SCORES / À PROPOS / RÉGLAGES |
+| scores.title | HIGH SCORES | MEILLEURS SCORES |
+| scores.columns | # / NAME / SCORE / LVL / KILLS | # / NOM / SCORE / NIV / TUÉS |
+| scores.back | Tap to go back | Touche pour revenir |
+| scores.empty | No scores yet, Rasta! | Pas encore de score, Rasta ! |
+| hud.score / hud.level / hud.plants | Score: {score7} / Level: {level2} / Plants: {alive}/26 | Score : {score7} / Niveau : {level2} / Plants : {alive}/26 |
+| pause.title / pause.resume / pause.menu | PAUSED / RESUME / MENU | PAUSE / REPRENDRE / MENU |
+| game.bossIncoming | BOSS INCOMING | BOSS EN APPROCHE |
+| game.combo | x{n} COMBO! (and x{multiplier, 1 decimal}) | x{n} COMBO ! (et x{multiplicateur, 1 décimale}) |
+| game.rocketMessage | Rasta rocket mon ! | Rasta rocket mon ! (patois kept) |
+| blessing.restored | +{n} Plants Restored | +1 plant restauré / +{n} plants restaurés |
+| blessing.phrases | 20 Jah exclamations (« More herb, man! »…) | the same 20, translated (« Plus d'herbe, man ! », « Jah sauve les plants ! »…) |
+| transition.level | LEVEL {n} | NIVEAU {n} |
+| transition.bonus | +{bonus} pts | +{bonus} pts |
+| transition.newWeapon | New Weapon: {weapon}! | Nouvelle arme : {weapon} ! |
+| transition.continue | Tap to continue | Touche pour continuer |
+| gameover.title | GAME OVER | GAME OVER |
+| gameover.stats | Score: {score7} / Kills: {kills} / Level: {level} | Score : {score7} / Tués : {kills} / Niveau : {level} |
+| gameover.newRecord | NEW HIGH SCORE! | NOUVEAU RECORD ! |
+| gameover.namePlaceholder | Your name, Rasta | Ton nom, Rasta |
+| gameover.save / gameover.saved | SAVE / Score saved! | ENREGISTRER / Score enregistré ! |
+| gameover.retry / gameover.menu | RETRY / MENU | REJOUER / MENU |
+| consent.title | Help the farm grow? | Aider la ferme à pousser ? |
+| consent.body | Share anonymous game statistics (levels reached, game length, crashes) to help improve Ganja Farmer. No name, no ID, no ads. | Partage des statistiques de jeu anonymes (niveaux atteints, durée des parties, plantages) pour améliorer Ganja Farmer. Pas de nom, pas d'identifiant, pas de pub. |
+| consent.footnote | You can change this anytime in SETUP. | Tu peux changer d'avis à tout moment dans RÉGLAGES. |
+| consent.accept / consent.refuse | YES, SHARE STATS / NO THANKS | OUI, PARTAGER / NON MERCI |
+| setup.title | SETUP | RÉGLAGES |
+| setup.sound / setup.music / setup.vibration / setup.stats | SOUND / MUSIC / VIBRATION / STATS | SON / MUSIQUE / VIBRATIONS / STATS |
+| setup.statsHelp | Anonymous statistics: levels, game length, crashes. No name, no ID. | Statistiques anonymes : niveaux, durée des parties, plantages. Pas de nom, pas d'identifiant. |
+| setup.on / setup.off | ON / OFF | ON / OFF |
+| setup.language / setup.languageAuto | LANGUAGE / AUTO (PHONE) | LANGUE / AUTO (TÉLÉPHONE) |
+| setup.reset | RESET HIGH SCORES | EFFACER LES SCORES |
+| setup.resetConfirm | Erase all high scores, Rasta? | Effacer tous les scores, Rasta ? |
+| setup.resetYes / setup.resetNo | ERASE / CANCEL | EFFACER / ANNULER |
+| common.back | BACK | RETOUR |
+| about.title | ABOUT | À PROPOS |
+| about.originalTitle / about.original | The Original Game (3 paragraphs) | Le jeu original (the 3 paragraphs translated) |
+| about.whyTitle | Why this game | Pourquoi ce jeu |
+| about.story | I played Ganja Farmer for hours as a teenager, on the family computer, found in a folder of downloaded freeware games. I made this version to bring it back on my phone - a tribute by a passionate independent developer, not affiliated with the original creators. | Ado, j'ai joué des heures à Ganja Farmer sur l'ordinateur familial, trouvé dans un dossier de freewares téléchargés. J'ai fait cette version pour le retrouver sur mon téléphone : un hommage d'un développeur indépendant passionné, sans lien avec les créateurs d'origine. |
+| about.versionTitle / about.thisVersion | This Version (2 paragraphs: made on free time, bugs possible, for adults) | Cette version (the 2 paragraphs translated) |
+| about.dataTitle / about.data | Your data / No account, no ads… | Tes données / Aucun compte, aucune pub… |
+| about.builtWithTitle | Built with | Fait avec |
+| about.version | Version {version} | Version {version} |
+| about.quote | "One good thing about music, when it hits you, you feel no pain." - Bob Marley | same English original (decided by the user) |
+| weapons | Pistol / Machine Gun / 20mm AA Gun / Rocket Launcher / Gatling / Laser Cannon | Pistolet / Mitrailleuse / Canon antiaérien 20 mm / Lance-roquettes / Gatling / Canon laser |
+| powerups | names (RASTA POWER, ONE DROP…) and descriptions (`x2 Damage 15s`…) | same English names (decided by the user), descriptions translated (`Dégâts x2 15 s`…) |
+| quotes | the 34 Jah messages of the source level transition, unchanged | the same 34 English originals (decided by the user) |
+| errors | Oops, Rasta / Something went wrong. Restart the game. / TRY AGAIN | Oups, Rasta / Un problème est survenu. Relance le jeu. / RÉESSAYER |
+
+Amendment 2026-10-26, version 0.2.0 (requested by the user): French added, English stays the reference and the
+fallback. Decided by the user: launcher name « Ganja Farmer » everywhere, the Jah quotes and the Bob Marley quote in
+their English original, power-up names in English (descriptions translated). New AC-43 to AC-45; AC-34 extended.
 
 ## Out of scope
 

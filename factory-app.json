@@ -5,5 +5,13 @@
   "stack": "expo",
   "description": "Landscape arcade shooter: defend a field of plants from helicopters and paratroopers (remake of the 1998 freeware)",
   "language": "en-US",
-  "factoryVersion": "1.0.0"
+  "factoryVersion": "1.0.0",
+  "languages": [
+    "en",
+    "fr"
+  ],
+  "fallbackLanguage": "en",
+  "displayNames": {
+    "fr": "Ganja Farmer"
+  }
 }
