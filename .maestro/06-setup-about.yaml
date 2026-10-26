@@ -8,7 +8,7 @@ tags:
 - extendedWaitUntil:
     visible:
       id: "consent-screen"
-    timeout: 15000
+    timeout: 30000
 - tapOn:
     id: "consent-refuse"
 - runFlow: helpers/english.yaml

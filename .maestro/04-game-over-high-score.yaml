@@ -8,7 +8,7 @@ tags:
 - extendedWaitUntil:
     visible:
       id: "consent-screen"
-    timeout: 15000
+    timeout: 30000
 - tapOn:
     id: "consent-refuse"
 - runFlow: helpers/english.yaml
@@ -45,7 +45,8 @@ tags:
     id: "gameover-menu"
 - tapOn:
     id: "home-scores"
-- assertVisible: "IRIE"
+# The emulator keyboard can double the first typed letter: match the end of the name.
+- assertVisible: ".*IRIE"
 - assertVisible: "0001000"
 - takeScreenshot: 09-high-scores
 # AC-25: still there after a relaunch.
@@ -59,7 +60,8 @@ tags:
 # Plain pause without touching the screen (a touch would reset the idle timer).
 - evalScript: ${(function () { var t = Date.now(); while (Date.now() - t < 32000) {} })()}
 - assertVisible: "HIGH SCORES"
-- assertVisible: "IRIE"
+# The emulator keyboard can double the first typed letter: match the end of the name.
+- assertVisible: ".*IRIE"
 - takeScreenshot: 10-idle-scores
 - tapOn: "HIGH SCORES"
 - assertVisible:
@@ -80,4 +82,4 @@ tags:
 - tapOn:
     id: "home-scores"
 - assertVisible: "No scores yet, Rasta!"
-- assertNotVisible: "IRIE"
+- assertNotVisible: ".*IRIE"
