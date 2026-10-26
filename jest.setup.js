@@ -45,3 +45,7 @@ jest.mock('expo-audio', () => ({
   createAudioPlayer: jest.fn(() => ({ play: jest.fn(), pause: jest.fn(), seekTo: jest.fn(() => Promise.resolve()), volume: 1, loop: false })),
   setAudioModeAsync: jest.fn(() => Promise.resolve()),
 }));
+
+// The phone's languages: English by default (the reference language of this game); a test can switch with
+// jest.mocked(deviceLanguageTags).mockReturnValue(['fr-FR']).
+jest.mock('./src/i18n/deviceLocale', () => ({ deviceLanguageTags: jest.fn(() => ['en-US']) }));

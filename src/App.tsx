@@ -7,6 +7,8 @@ import { backgroundMusic } from './audio/music';
 import { playFeedback } from './audio/player';
 import { GameEngine } from './game/engine';
 import { HighScoreEntry, qualifies } from './game/highScores';
+import { LanguageSetting } from './i18n';
+import { I18nProvider } from './i18n/I18nProvider';
 import { makeLayout } from './game/layout';
 import { GameEvent } from './game/types';
 import { AboutScreen } from './screens/AboutScreen';
@@ -18,6 +20,7 @@ import { HomeScreen } from './screens/HomeScreen';
 import { SetupScreen } from './screens/SetupScreen';
 import { SPLASH_MS, SplashScreen } from './screens/SplashScreen';
 import { clearHighScores, loadHighScores, saveHighScore } from './storage/highScores';
+import { loadLanguageSetting, saveLanguageSetting } from './storage/languageSetting';
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from './storage/settings';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { telemetryFor, trackMapped } from './telemetry/gameTelemetry';
@@ -36,6 +39,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const [route, setRoute] = useState<Route>('home');
   const [scores, setScores] = useState<HighScoreEntry[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [languageSetting, setLanguageSetting] = useState<LanguageSetting>('auto');
   const feedback = useMemo(() => new FeedbackPolicy(), []);
   // In front unless explicitly in the background (Android may report "unknown" while starting).
   const [foreground, setForeground] = useState(AppState.currentState !== 'background');
@@ -49,11 +53,17 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const [storedConsent, storedScores, storedSettings] = await Promise.all([loadConsent(), loadHighScores(), loadSettings()]);
+      const [storedConsent, storedScores, storedSettings, storedLanguage] = await Promise.all([
+        loadConsent(),
+        loadHighScores(),
+        loadSettings(),
+        loadLanguageSetting(),
+      ]);
       if (storedConsent !== 'unknown') await applyConsent(storedConsent === 'granted');
       if (alive) {
         setScores(storedScores);
         setSettings(storedSettings);
+        setLanguageSetting(storedLanguage);
         setConsentState(storedConsent);
         NativeSplash.hideAsync().catch(() => {});
       }
@@ -197,11 +207,19 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
     );
   }
 
+  // The switch is immediate (context), then saved; a game in progress is not touched.
+  const changeLanguage = (value: LanguageSetting) => {
+    setLanguageSetting(value);
+    void saveLanguageSetting(value);
+  };
+
   return (
-    <ErrorBoundary>
-      <StatusBar hidden />
-      {content}
-    </ErrorBoundary>
+    <I18nProvider setting={languageSetting} onChange={changeLanguage}>
+      <ErrorBoundary>
+        <StatusBar hidden />
+        {content}
+      </ErrorBoundary>
+    </I18nProvider>
   );
 }
 

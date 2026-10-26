@@ -3,7 +3,7 @@
 import { SkCanvas } from '@shopify/react-native-skia';
 
 import { GameEngine } from '../game/engine';
-import { en } from '../i18n/en';
+import type { Strings } from '../i18n';
 import {
   drawA10,
   drawBabylonTrap,
@@ -31,7 +31,7 @@ export interface SceneOverlay {
   bossWarning: string | null;
 }
 
-export function drawScene(canvas: SkCanvas, engine: GameEngine, overlay: SceneOverlay): void {
+export function drawScene(canvas: SkCanvas, engine: GameEngine, overlay: SceneOverlay, t: Strings): void {
   drawBackground(canvas);
   for (const plant of engine.plants) drawPlant(canvas, plant);
   drawFence(canvas);
@@ -65,6 +65,6 @@ export function drawScene(canvas: SkCanvas, engine: GameEngine, overlay: SceneOv
   for (const plant of engine.plants) if (plant.alive && engine.plantShields[plant.index]) drawShieldIndicator(canvas, plant);
   if (engine.zionWallHits > 0) drawZionWall(canvas, engine.zionWallHits);
   if (engine.babylonTrapCharges > 0) drawBabylonTrap(canvas, engine.babylonTrapCharges);
-  if (engine.comboCount >= 2) drawCombo(canvas, en.game.combo(engine.comboCount), en.game.multiplier(engine.comboMultiplier));
-  if (overlay.bossWarning) drawBossWarning(canvas, en.game.bossIncoming, overlay.bossWarning);
+  if (engine.comboCount >= 2) drawCombo(canvas, t.game.combo(engine.comboCount), t.game.multiplier(engine.comboMultiplier));
+  if (overlay.bossWarning) drawBossWarning(canvas, t.game.bossIncoming, overlay.bossWarning);
 }

@@ -5,7 +5,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { PLANT_COUNT } from '../game/layout';
 import { weaponForLevel } from '../game/weapons';
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { colors } from '../ui/theme';
 
 type Props = {
@@ -18,6 +18,7 @@ type Props = {
 };
 
 export function LevelTransition({ nextLevel, bonus, restored, alive, quote, onContinue }: Props) {
+  const { t } = useI18n();
   const fade = useRef(new Animated.Value(0)).current;
   const [ready, setReady] = useState(false);
   const leaving = useRef(false);
@@ -37,18 +38,18 @@ export function LevelTransition({ nextLevel, bonus, restored, alive, quote, onCo
   return (
     <Pressable style={styles.container} onPress={handleContinue} testID="level-transition" accessibilityRole="button">
       <Animated.View style={[styles.content, { opacity: fade }]}>
-        <Text style={styles.levelText}>{en.transition.level(nextLevel)}</Text>
-        <Text style={styles.jahText}>{en.transition.jah}</Text>
+        <Text style={styles.levelText}>{t.transition.level(nextLevel)}</Text>
+        <Text style={styles.jahText}>{t.transition.jah}</Text>
         <Text style={styles.message}>{quote}</Text>
         <View style={styles.blessings}>
-          {bonus > 0 && <Text style={styles.bonusText}>{en.transition.bonus(bonus)}</Text>}
-          {restored > 0 && <Text style={styles.blessingText}>{en.blessing.restored(restored)}</Text>}
-          {isNewWeapon && <Text style={styles.weaponText}>{en.transition.newWeapon(en.weapons[weapon.id])}</Text>}
+          {bonus > 0 && <Text style={styles.bonusText}>{t.transition.bonus(bonus)}</Text>}
+          {restored > 0 && <Text style={styles.blessingText}>{t.blessing.restored(restored)}</Text>}
+          {isNewWeapon && <Text style={styles.weaponText}>{t.transition.newWeapon(t.weapons[weapon.id])}</Text>}
         </View>
-        <Text style={styles.plantsText}>{en.transition.plants(alive, PLANT_COUNT)}</Text>
+        <Text style={styles.plantsText}>{t.transition.plants(alive, PLANT_COUNT)}</Text>
         {ready && (
           <Text style={styles.continueText} testID="transition-continue">
-            {en.transition.continue}
+            {t.transition.continue}
           </Text>
         )}
       </Animated.View>

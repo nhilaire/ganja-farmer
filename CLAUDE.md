@@ -4,9 +4,10 @@ Small Android game built with React Native by the Android game factory. Package:
 
 ## Non-negotiable rules
 
-- **Languages**: code, comments, commits, README and docs in English. Everything the player sees is in **English** too
-  (user decision recorded in docs/BRIEF.md and docs/PRD.md, an exception to the factory French default). Strings live in
-  `src/i18n/en.ts`, never inline in components.
+- **Languages**: code, comments, commits, README and docs in English. Everything the player sees exists in **English**
+  (the reference, user decision) **and French** (v0.2.0): `src/i18n/en.ts` and `fr.ts`, read with `useI18n()`, never
+  inline in components. Kept in English in every language (user decision): the Jah quotes (`quotes.ts`), the Bob
+  Marley quote and the power-up names.
 - **No secrets, no personal data in git.** `firebase/google-services.json`, keystores, `.env`, APKs stay local.
   Never write a real name, email, phone number or local user path in code, docs, screenshots or logs.
   The pre-commit and pre-push hooks run `scripts/secret-scan.mjs`; never bypass them (`--no-verify` is forbidden).
@@ -23,7 +24,7 @@ Small Android game built with React Native by the Android game factory. Package:
 | `src/game/` | Pure TypeScript game logic (no React): state, rules, scoring. 100% unit-tested. |
 | `src/screens/`, `src/ui/` | React components. No game rules here. |
 | `src/telemetry/` | Consent, typed event catalog, Firebase wrapper (no-op if Firebase is absent). |
-| `src/i18n/en.ts` | All player-facing English text (`quotes.ts`: the source quotes). |
+| `src/i18n/` | Player-facing text per language (`en.ts` reference, `fr.ts`; `quotes.ts`: the source quotes), language resolution and provider. |
 | `.maestro/` | E2E flows run on the emulator; screenshots become evidence. |
 | `docs/` | BRIEF, PRD, ADRs, PLAN, KPIS, evidence per version. |
 

@@ -1,8 +1,9 @@
 // SETUP (was "Coming soon" in the source): sound, music, vibration and statistics toggles, reset of the high scores.
 import { useEffect, useState } from 'react';
-import { BackHandler, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { BackHandler, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { en } from '../i18n/en';
+import { LANGUAGE_NAMES, LANGUAGES, LanguageSetting } from '../i18n';
+import { useI18n } from '../i18n/I18nProvider';
 import { colors, spacing } from '../ui/theme';
 
 type Props = {
@@ -19,13 +20,14 @@ type Props = {
 };
 
 function Toggle({ label, help, value, onChange, testID }: { label: string; help?: string; value: boolean; onChange: (on: boolean) => void; testID: string }) {
+  const { t } = useI18n();
   return (
     <View style={styles.row}>
       <View style={styles.rowText}>
         <Text style={styles.label}>{label}</Text>
         {help ? <Text style={styles.help}>{help}</Text> : null}
       </View>
-      <Text style={styles.state}>{value ? en.setup.on : en.setup.off}</Text>
+      <Text style={styles.state}>{value ? t.setup.on : t.setup.off}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
@@ -47,7 +49,13 @@ function Action({ label, onPress, testID, color }: { label: string; onPress: () 
 }
 
 export function SetupScreen({ sound, music, vibration, stats, onSound, onMusic, onVibration, onStats, onResetScores, onBack }: Props) {
+  const { t, setting, setSetting } = useI18n();
   const [confirming, setConfirming] = useState(false);
+  // Each language is named in itself; AUTO follows the phone.
+  const choices: { value: LanguageSetting; label: string }[] = [
+    { value: 'auto', label: t.setup.languageAuto },
+    ...LANGUAGES.map((language) => ({ value: language, label: LANGUAGE_NAMES[language] })),
+  ];
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -60,21 +68,40 @@ export function SetupScreen({ sound, music, vibration, stats, onSound, onMusic, 
   return (
     <View style={styles.container} testID="setup-screen">
       <Text style={styles.title} accessibilityRole="header">
-        {en.setup.title}
+        {t.setup.title}
       </Text>
       <View style={styles.rasta} />
-      <View style={styles.list}>
-        <Toggle label={en.setup.sound} value={sound} onChange={onSound} testID="setup-sound" />
-        <Toggle label={en.setup.music} value={music} onChange={onMusic} testID="setup-music" />
-        <Toggle label={en.setup.vibration} value={vibration} onChange={onVibration} testID="setup-vibration" />
-        <Toggle label={en.setup.stats} help={en.setup.statsHelp} value={stats} onChange={onStats} testID="setup-stats" />
-      </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.list}>
+        <Toggle label={t.setup.sound} value={sound} onChange={onSound} testID="setup-sound" />
+        <Toggle label={t.setup.music} value={music} onChange={onMusic} testID="setup-music" />
+        <Toggle label={t.setup.vibration} value={vibration} onChange={onVibration} testID="setup-vibration" />
+        <Toggle label={t.setup.stats} help={t.setup.statsHelp} value={stats} onChange={onStats} testID="setup-stats" />
+        <View style={styles.row} accessibilityRole="radiogroup" accessibilityLabel={t.setup.language}>
+          <Text style={[styles.label, styles.rowText]}>{t.setup.language}</Text>
+          {choices.map(({ value, label }) => {
+            const selected = value === setting;
+            return (
+              <Pressable
+                key={value}
+                testID={`settings-language-${value}`}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selected }}
+                accessibilityLabel={label}
+                onPress={() => setSetting(value)}
+                style={[styles.choice, selected && styles.choiceSelected]}
+              >
+                <Text style={[styles.choiceText, selected && styles.choiceTextSelected]}>{label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
       {confirming ? (
         <View style={styles.confirm} testID="setup-reset-confirm">
-          <Text style={styles.confirmText}>{en.setup.resetConfirm}</Text>
+          <Text style={styles.confirmText}>{t.setup.resetConfirm}</Text>
           <View style={styles.actions}>
             <Action
-              label={en.setup.resetYes}
+              label={t.setup.resetYes}
               testID="setup-reset-yes"
               color={colors.rastaRed}
               onPress={async () => {
@@ -82,13 +109,13 @@ export function SetupScreen({ sound, music, vibration, stats, onSound, onMusic, 
                 await onResetScores();
               }}
             />
-            <Action label={en.setup.resetNo} testID="setup-reset-no" color={colors.surface} onPress={() => setConfirming(false)} />
+            <Action label={t.setup.resetNo} testID="setup-reset-no" color={colors.surface} onPress={() => setConfirming(false)} />
           </View>
         </View>
       ) : (
         <View style={styles.actions}>
-          <Action label={en.setup.reset} testID="setup-reset" color={colors.rastaRed} onPress={() => setConfirming(true)} />
-          <Action label={en.setup.back} testID="setup-back" color={colors.surface} onPress={onBack} />
+          <Action label={t.setup.reset} testID="setup-reset" color={colors.rastaRed} onPress={() => setConfirming(true)} />
+          <Action label={t.setup.back} testID="setup-back" color={colors.surface} onPress={onBack} />
         </View>
       )}
     </View>
@@ -107,7 +134,12 @@ const styles = StyleSheet.create({
     textShadowRadius: 0,
   },
   rasta: { height: 4, width: 200, marginVertical: spacing.sm, backgroundColor: colors.rastaRed, borderRadius: 2 },
-  list: { width: '70%', gap: spacing.xs },
+  scroll: { width: '70%', flexGrow: 0, flexShrink: 1 },
+  list: { gap: spacing.xs },
+  choice: { minHeight: 36, justifyContent: 'center', borderRadius: 8, borderWidth: 2, borderColor: '#444444', paddingHorizontal: spacing.sm },
+  choiceSelected: { borderColor: colors.rastaYellow },
+  choiceText: { color: colors.text, fontSize: 13, fontWeight: 'bold' },
+  choiceTextSelected: { color: colors.rastaYellow },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { APP_VERSION } from '../config/app';
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { colors, spacing } from '../ui/theme';
 
 function Section({ title, paragraphs }: { title: string; paragraphs: readonly string[] }) {
@@ -21,6 +21,7 @@ function Section({ title, paragraphs }: { title: string; paragraphs: readonly st
 }
 
 export function AboutScreen({ onBack }: { onBack: () => void }) {
+  const { t } = useI18n();
   // Android back returns to Home.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -34,29 +35,29 @@ export function AboutScreen({ onBack }: { onBack: () => void }) {
     <View style={styles.container} testID="about-screen">
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.title} accessibilityRole="header">
-          {en.about.title}
+          {t.about.title}
         </Text>
         <View style={styles.rasta} />
-        <Section title={en.about.originalTitle} paragraphs={en.about.original} />
+        <Section title={t.about.originalTitle} paragraphs={t.about.original} />
         <View style={styles.separator} />
-        <Section title={en.about.whyTitle} paragraphs={en.about.story} />
+        <Section title={t.about.whyTitle} paragraphs={t.about.story} />
         <View style={styles.separator} />
-        <Section title={en.about.versionTitle} paragraphs={en.about.thisVersion} />
+        <Section title={t.about.versionTitle} paragraphs={t.about.thisVersion} />
         <View style={styles.separator} />
-        <Section title={en.about.dataTitle} paragraphs={en.about.data} />
+        <Section title={t.about.dataTitle} paragraphs={t.about.data} />
         <View style={styles.separator} />
-        <Text style={styles.techTitle}>{en.about.builtWithTitle}</Text>
-        {en.about.builtWith.map((line) => (
+        <Text style={styles.techTitle}>{t.about.builtWithTitle}</Text>
+        {t.about.builtWith.map((line) => (
           <Text key={line} style={styles.techText}>
             {line}
           </Text>
         ))}
-        <Text style={styles.version}>{en.about.version(APP_VERSION)}</Text>
+        <Text style={styles.version}>{t.about.version(APP_VERSION)}</Text>
         <View style={styles.separator} />
-        <Text style={styles.quote}>{en.about.quote}</Text>
-        <Text style={styles.quoteAuthor}>{en.about.quoteAuthor}</Text>
+        <Text style={styles.quote}>{t.about.quote}</Text>
+        <Text style={styles.quoteAuthor}>{t.about.quoteAuthor}</Text>
         <Pressable style={styles.backButton} onPress={onBack} testID="about-back" accessibilityRole="button">
-          <Text style={styles.backText}>{en.about.back}</Text>
+          <Text style={styles.backText}>{t.about.back}</Text>
         </Pressable>
       </ScrollView>
     </View>

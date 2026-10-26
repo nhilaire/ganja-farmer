@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import App from '../App';
+import { deviceLanguageTags } from '../i18n/deviceLocale';
 
 // render/fireEvent are awaited: asynchronous in React Native Testing Library 14+, harmless before.
 describe('App', () => {
@@ -50,5 +51,52 @@ describe('App', () => {
       jest.advanceTimersByTime(2000);
     });
     expect(screen.getByText('Help the farm grow?')).toBeTruthy();
+  });
+});
+
+describe('languages (AC-43, AC-44)', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+    jest.mocked(deviceLanguageTags).mockReturnValue(['en-US']);
+  });
+
+  it('speaks French on a French phone', async () => {
+    jest.mocked(deviceLanguageTags).mockReturnValue(['fr-FR']);
+    await render(<App splashMs={0} />);
+    expect(await screen.findByText('Aider la ferme à pousser ?')).toBeTruthy();
+    await fireEvent.press(screen.getByText('NON MERCI'));
+    expect(await screen.findByText('JOUER')).toBeTruthy();
+    expect(screen.getByText('Défends ton champ, Rasta !')).toBeTruthy();
+  });
+
+  it('uses English on a phone in an unsupported language', async () => {
+    jest.mocked(deviceLanguageTags).mockReturnValue(['it-IT']);
+    await AsyncStorage.setItem('telemetry.consent.v1', 'denied');
+    await render(<App splashMs={0} />);
+    expect(await screen.findByText('PLAY')).toBeTruthy();
+  });
+
+  it('switches language from SETUP at once and remembers the choice', async () => {
+    await AsyncStorage.setItem('telemetry.consent.v1', 'denied');
+    await render(<App splashMs={0} />);
+    await fireEvent.press(await screen.findByTestId('home-setup'));
+    await fireEvent.press(screen.getByTestId('settings-language-fr'));
+    expect(await screen.findByText('RÉGLAGES')).toBeTruthy();
+    expect(screen.getByText('SON')).toBeTruthy();
+    expect(await AsyncStorage.getItem('settings.language.v1')).toBe('fr');
+    await screen.unmount();
+    await render(<App splashMs={0} />);
+    expect(await screen.findByText('JOUER')).toBeTruthy();
+  });
+
+  it('goes back to the phone language with AUTO', async () => {
+    await AsyncStorage.multiSet([
+      ['telemetry.consent.v1', 'denied'],
+      ['settings.language.v1', 'fr'],
+    ]);
+    await render(<App splashMs={0} />);
+    await fireEvent.press(await screen.findByTestId('home-setup'));
+    await fireEvent.press(screen.getByTestId('settings-language-auto'));
+    expect(await screen.findByText('SETUP')).toBeTruthy();
   });
 });

@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { GanjaLeaf } from '../ui/GanjaLeaf';
 import { colors } from '../ui/theme';
 
@@ -28,6 +28,7 @@ function LeafButton({ label, onPress, testID }: { label: string; onPress: () => 
 }
 
 export function HomeScreen({ hasScores, onPlay, onScores, onAbout, onSetup }: Props) {
+  const { t } = useI18n();
   const idle = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetIdle = useCallback(() => {
@@ -46,15 +47,15 @@ export function HomeScreen({ hasScores, onPlay, onScores, onAbout, onSetup }: Pr
     <View style={styles.container} testID="home-screen" onTouchStart={resetIdle}>
       <View style={styles.center}>
         <View style={styles.titleContainer} accessibilityRole="header">
-          <Text style={styles.titleGanja}>{en.home.titleTop}</Text>
-          <Text style={styles.titleFarmer}>{en.home.titleBottom}</Text>
+          <Text style={styles.titleGanja}>{t.home.titleTop}</Text>
+          <Text style={styles.titleFarmer}>{t.home.titleBottom}</Text>
         </View>
-        <Text style={styles.subtitle}>{en.home.subtitle}</Text>
+        <Text style={styles.subtitle}>{t.home.subtitle}</Text>
         <Pressable style={styles.playButton} onPress={onPlay} testID="home-play" accessibilityRole="button">
-          <Text style={styles.playText}>{en.home.play}</Text>
+          <Text style={styles.playText}>{t.home.play}</Text>
         </Pressable>
         <View style={styles.controls}>
-          {en.home.hints.map((hint) => (
+          {t.home.hints.map((hint) => (
             <Text key={hint} style={styles.controlText}>
               {hint}
             </Text>
@@ -62,9 +63,9 @@ export function HomeScreen({ hasScores, onPlay, onScores, onAbout, onSetup }: Pr
         </View>
       </View>
       <View style={styles.leafMenu}>
-        <LeafButton label={en.home.scores} onPress={onScores} testID="home-scores" />
-        <LeafButton label={en.home.about} onPress={onAbout} testID="home-about" />
-        <LeafButton label={en.home.setup} onPress={onSetup} testID="home-setup" />
+        <LeafButton label={t.home.scores} onPress={onScores} testID="home-scores" />
+        <LeafButton label={t.home.about} onPress={onAbout} testID="home-about" />
+        <LeafButton label={t.home.setup} onPress={onSetup} testID="home-setup" />
       </View>
     </View>
   );

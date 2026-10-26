@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { BackHandler, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { MAX_NAME_LENGTH } from '../game/highScores';
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { colors, spacing } from '../ui/theme';
 
 export const GAME_OVER_UI_DELAY_MS = 3000;
@@ -27,6 +27,7 @@ function Action({ label, onPress, testID, color }: { label: string; onPress: () 
 }
 
 export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRetry, onMenu }: Props) {
+  const { t } = useI18n();
   const [showUI, setShowUI] = useState(false);
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
@@ -52,22 +53,22 @@ export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRet
   return (
     <View style={styles.container} testID="gameover-screen">
       <Text style={styles.title} accessibilityRole="header">
-        {en.gameOver.title}
+        {t.gameOver.title}
       </Text>
       <View style={styles.stats}>
-        <Text style={styles.stat}>{en.gameOver.score(score)}</Text>
-        <Text style={styles.stat}>{en.gameOver.kills(kills)}</Text>
-        <Text style={styles.stat}>{en.gameOver.level(level)}</Text>
+        <Text style={styles.stat}>{t.gameOver.score(score)}</Text>
+        <Text style={styles.stat}>{t.gameOver.kills(kills)}</Text>
+        <Text style={styles.stat}>{t.gameOver.level(level)}</Text>
       </View>
       {showUI && isHighScore && !saved && (
         <View style={styles.record}>
-          <Text style={styles.newRecord}>{en.gameOver.newRecord}</Text>
+          <Text style={styles.newRecord}>{t.gameOver.newRecord}</Text>
           <View style={styles.nameRow}>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={setName}
-              placeholder={en.gameOver.namePlaceholder}
+              placeholder={t.gameOver.namePlaceholder}
               placeholderTextColor="#88AA88"
               maxLength={MAX_NAME_LENGTH}
               autoCapitalize="characters"
@@ -76,15 +77,15 @@ export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRet
               onSubmitEditing={save}
               testID="gameover-name"
             />
-            <Action label={en.gameOver.save} onPress={save} testID="gameover-save" color={colors.rastaGreen} />
+            <Action label={t.gameOver.save} onPress={save} testID="gameover-save" color={colors.rastaGreen} />
           </View>
         </View>
       )}
-      {saved && <Text style={styles.saved}>{en.gameOver.saved}</Text>}
+      {saved && <Text style={styles.saved}>{t.gameOver.saved}</Text>}
       {showUI && (
         <View style={styles.actions}>
-          <Action label={en.gameOver.retry} onPress={onRetry} testID="gameover-retry" color={colors.rastaRed} />
-          <Action label={en.gameOver.menu} onPress={onMenu} testID="gameover-menu" color={colors.surface} />
+          <Action label={t.gameOver.retry} onPress={onRetry} testID="gameover-retry" color={colors.rastaRed} />
+          <Action label={t.gameOver.menu} onPress={onMenu} testID="gameover-menu" color={colors.surface} />
         </View>
       )}
     </View>

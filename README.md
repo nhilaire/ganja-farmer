@@ -2,7 +2,7 @@
 
 A landscape arcade shooter for Android, made with React Native, Expo and Skia: defend your field of 26 plants
 from helicopters, paratroopers, bombers, UFOs and bosses. A tribute to the 1998 freeware *Ganja Farmer*, not
-affiliated with its creators. The game is in English and intended for adults.
+affiliated with its creators. The game is in English and French (it follows the phone's language, changeable in SETUP) and intended for adults.
 
 ## Screenshots
 

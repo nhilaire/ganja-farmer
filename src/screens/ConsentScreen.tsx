@@ -1,23 +1,24 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { Button } from '../ui/Button';
 import { Screen } from '../ui/Screen';
 import { colors, font, spacing } from '../ui/theme';
 
 // First-launch consent (GDPR/CNIL): both choices are equally easy, nothing is sent before a choice.
 export function ConsentScreen({ onDecision }: { onDecision: (granted: boolean) => void }) {
+  const { t } = useI18n();
   return (
     <Screen testID="consent-screen">
       <View style={styles.content}>
         <Text style={styles.title} accessibilityRole="header">
-          {en.consent.title}
+          {t.consent.title}
         </Text>
-        <Text style={styles.body}>{en.consent.body}</Text>
-        <Text style={styles.footnote}>{en.consent.footnote}</Text>
+        <Text style={styles.body}>{t.consent.body}</Text>
+        <Text style={styles.footnote}>{t.consent.footnote}</Text>
       </View>
-      <Button label={en.consent.accept} onPress={() => onDecision(true)} testID="consent-accept" />
-      <Button label={en.consent.refuse} onPress={() => onDecision(false)} variant="secondary" testID="consent-refuse" />
+      <Button label={t.consent.accept} onPress={() => onDecision(true)} testID="consent-accept" />
+      <Button label={t.consent.refuse} onPress={() => onDecision(false)} variant="secondary" testID="consent-refuse" />
     </Screen>
   );
 }

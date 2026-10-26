@@ -7,7 +7,8 @@ import { GameEngine } from '../game/engine';
 import { PLANT_COUNT } from '../game/layout';
 import { Aim, TouchTracker } from '../game/touches';
 import { GameEvent } from '../game/types';
-import { en, JAH_QUOTES } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
+import { JAH_QUOTES } from '../i18n/quotes';
 import { setRenderLayout } from '../render/renderer';
 import { drawScene } from '../render/scene';
 import { colors, spacing } from '../ui/theme';
@@ -40,6 +41,7 @@ function pickQuote(): string {
 }
 
 export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
+  const { t } = useI18n();
   const [, setFrame] = useState(0);
   const [paused, setPaused] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' });
@@ -74,14 +76,14 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
       for (const e of events) {
         switch (e.type) {
           case 'powerUpActivated':
-            showMessage(en.powerUps[e.id].name, en.powerUps[e.id].description);
+            showMessage(t.powerUps[e.id].name, t.powerUps[e.id].description);
             break;
           case 'bossSpawn':
             setBossWarning(e.name);
             later(3000, () => setBossWarning(null));
             break;
           case 'levelStart':
-            if (e.level === 10) showMessage(en.game.rocketMessage, undefined, 3000);
+            if (e.level === 10) showMessage(t.game.rocketMessage, undefined, 3000);
             break;
           case 'levelComplete':
             setOverlay(
@@ -190,7 +192,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
   const onTouchCancel = useCallback(() => applyAim(fingers.clear()), [fingers, applyAim]);
 
-  const picture = createPicture((canvas) => drawScene(canvas, engine, { bossWarning }));
+  const picture = createPicture((canvas) => drawScene(canvas, engine, { bossWarning }, t));
 
   return (
     <View
@@ -207,22 +209,22 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
       <View style={[styles.hud, { height: engine.layout.hudHeight + 6 }]} pointerEvents="box-none">
         <Text style={styles.hudText} testID="hud-score">
-          {en.hud.score(engine.score)}
+          {t.hud.score(engine.score)}
         </Text>
         <Text style={styles.hudText} testID="hud-level">
-          {en.hud.level(engine.level)}
+          {t.hud.level(engine.level)}
         </Text>
         <Text style={styles.hudText} testID="hud-plants">
-          {en.hud.plants(engine.alivePlants, PLANT_COUNT)}
+          {t.hud.plants(engine.alivePlants, PLANT_COUNT)}
         </Text>
         <Text style={styles.hudText} testID="hud-weapon">
-          {en.hud.weapon(en.weapons[engine.weapon.id])}
+          {t.hud.weapon(t.weapons[engine.weapon.id])}
         </Text>
         <Pressable
           onPress={pause}
           testID="game-pause"
           accessibilityRole="button"
-          accessibilityLabel={en.pause.button}
+          accessibilityLabel={t.pause.button}
           style={styles.pauseButton}
           hitSlop={12}
         >
@@ -233,7 +235,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
       <View style={[styles.effects, { top: engine.layout.hudHeight + 10 }]} pointerEvents="none">
         {engine.activeEffects.map((effect) => (
           <Text key={effect.id} style={styles.effectText}>
-            {en.hud.effect(en.powerUps[effect.id].name, Math.ceil(effect.remaining))}
+            {t.hud.effect(t.powerUps[effect.id].name, Math.ceil(effect.remaining))}
           </Text>
         ))}
       </View>
@@ -269,12 +271,12 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
       {paused && (
         <View style={styles.pauseOverlay} testID="pause-overlay">
-          <Text style={styles.pauseTitle}>{en.pause.title}</Text>
+          <Text style={styles.pauseTitle}>{t.pause.title}</Text>
           <Pressable style={styles.pauseAction} onPress={resume} testID="pause-resume" accessibilityRole="button">
-            <Text style={styles.pauseActionText}>{en.pause.resume}</Text>
+            <Text style={styles.pauseActionText}>{t.pause.resume}</Text>
           </Pressable>
           <Pressable style={[styles.pauseAction, styles.pauseMenu]} onPress={onQuit} testID="pause-menu" accessibilityRole="button">
-            <Text style={styles.pauseActionText}>{en.pause.menu}</Text>
+            <Text style={styles.pauseActionText}>{t.pause.menu}</Text>
           </Pressable>
         </View>
       )}

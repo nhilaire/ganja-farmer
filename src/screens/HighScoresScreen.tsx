@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { BackHandler, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { HighScoreEntry } from '../game/highScores';
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 import { pad } from '../i18n/format';
 import { colors } from '../ui/theme';
 
@@ -12,6 +12,7 @@ export const SCORES_AUTO_RETURN_MS = 30_000;
 type Props = { scores: readonly HighScoreEntry[]; onBack: () => void };
 
 export function HighScoresScreen({ scores, onBack }: Props) {
+  const { t } = useI18n();
   useEffect(() => {
     const timer = setTimeout(onBack, SCORES_AUTO_RETURN_MS);
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -27,16 +28,16 @@ export function HighScoresScreen({ scores, onBack }: Props) {
   return (
     <Pressable style={styles.container} onPress={onBack} testID="scores-screen" accessibilityRole="button">
       <Text style={styles.title} accessibilityRole="header">
-        {en.scores.title}
+        {t.scores.title}
       </Text>
       <View style={styles.row}>
-        <Text style={[styles.header, styles.rank]}>{en.scores.rank}</Text>
-        <Text style={[styles.header, styles.name]}>{en.scores.name}</Text>
-        <Text style={[styles.header, styles.score]}>{en.scores.score}</Text>
-        <Text style={[styles.header, styles.level]}>{en.scores.level}</Text>
-        <Text style={[styles.header, styles.kills]}>{en.scores.kills}</Text>
+        <Text style={[styles.header, styles.rank]}>{t.scores.rank}</Text>
+        <Text style={[styles.header, styles.name]}>{t.scores.name}</Text>
+        <Text style={[styles.header, styles.score]}>{t.scores.score}</Text>
+        <Text style={[styles.header, styles.level]}>{t.scores.level}</Text>
+        <Text style={[styles.header, styles.kills]}>{t.scores.kills}</Text>
       </View>
-      {scores.length === 0 && <Text style={styles.cell}>{en.scores.empty}</Text>}
+      {scores.length === 0 && <Text style={styles.cell}>{t.scores.empty}</Text>}
       {scores.map((entry, i) => (
         <View key={entry.date + i} style={[styles.row, i === 0 && styles.firstRow]} testID={'score-row-' + i}>
           <Text style={[styles.cell, styles.rank, i === 0 && styles.first]}>{i + 1}</Text>
@@ -46,7 +47,7 @@ export function HighScoresScreen({ scores, onBack }: Props) {
           <Text style={[styles.cell, styles.kills, i === 0 && styles.first]}>{entry.kills}</Text>
         </View>
       ))}
-      <Text style={styles.hint}>{en.scores.back}</Text>
+      <Text style={styles.hint}>{t.scores.back}</Text>
     </Pressable>
   );
 }

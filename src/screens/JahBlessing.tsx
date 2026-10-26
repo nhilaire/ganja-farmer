@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, StyleSheet, Text, View } from 'react-native';
 
-import { en } from '../i18n/en';
+import { useI18n } from '../i18n/I18nProvider';
 
 const { width, height } = Dimensions.get('screen');
 const W = Math.max(width, height);
@@ -11,7 +11,8 @@ const W = Math.max(width, height);
 type Props = { onComplete: () => void; restored: number; groundY: number };
 
 export function JahBlessing({ onComplete, restored, groundY }: Props) {
-  const [phrase] = useState(() => en.blessing.phrases[Math.floor(Math.random() * en.blessing.phrases.length)]);
+  const { t } = useI18n();
+  const [phrase] = useState(() => t.blessing.phrases[Math.floor(Math.random() * t.blessing.phrases.length)]);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const jahY = useRef(new Animated.Value(-100)).current;
@@ -143,7 +144,7 @@ export function JahBlessing({ onComplete, restored, groundY }: Props) {
         opacity: textOpacity,
       }]}>
         <Text style={styles.phraseText}>{phrase}</Text>
-        <Text style={styles.restoredText}>{en.blessing.restored(restored)}</Text>
+        <Text style={styles.restoredText}>{t.blessing.restored(restored)}</Text>
       </Animated.View>
     </View>
   );

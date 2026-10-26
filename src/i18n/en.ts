@@ -1,10 +1,13 @@
-// Every player-facing string lives here, in English (user decision, see docs/PRD.md "Player-facing copy").
-// Components never inline text. Casual tone with rasta winks, as in the source game.
+// Every player-facing string lives in a dictionary, English first (the reference, user decision, see docs/PRD.md
+// "Player copy"). Components never inline text: they read `t` from useI18n(). fr.ts must have the same keys.
+// Casual tone with rasta winks, as in the source game.
 import { pad } from './format';
 
 export { JAH_QUOTES } from './quotes';
 
 export const en = {
+  // BCP 47 locale of this language.
+  locale: 'en-US',
   consent: {
     title: 'Help the farm grow?',
     body:
@@ -107,6 +110,8 @@ export const en = {
     statsHelp: 'Anonymous statistics: levels, game length, crashes. No name, no ID.',
     on: 'ON',
     off: 'OFF',
+    language: 'LANGUAGE',
+    languageAuto: 'AUTO (PHONE)',
     reset: 'RESET HIGH SCORES',
     resetConfirm: 'Erase all high scores, Rasta?',
     resetYes: 'ERASE',
@@ -178,15 +183,5 @@ export const en = {
     title: 'Oops, Rasta',
     body: 'Something went wrong. Restart the game.',
     retry: 'TRY AGAIN',
-  },
-  // Factory template demo screen, removed when the real Game screen lands (T-12).
-  demo: {
-    tap: 'Tap!',
-    score: (score: number) => `Score: ${score}`,
-    timeLeft: (seconds: number) => `Time: ${seconds}s`,
-    over: 'GAME OVER',
-    finalScore: (score: number) => `Score: ${score}`,
-    playAgain: 'RETRY',
-    home: 'MENU',
   },
 } as const;
