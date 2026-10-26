@@ -2,7 +2,7 @@
 
 A landscape arcade shooter for Android, made with React Native, Expo and Skia: defend your field of 26 plants
 from helicopters, paratroopers, bombers, UFOs and bosses. A tribute to the 1998 freeware *Ganja Farmer*, not
-affiliated with its creators. The game is in English and French (it follows the phone's language, changeable in SETUP) and intended for adults.
+affiliated with its creators. The game is in English and French (it follows the phone's language, changeable in SETUP / RÉGLAGES) and intended for adults.
 
 ## Screenshots
 
@@ -24,7 +24,7 @@ background music, which is not redistributable.
 
 - No account, no ads, no personal data.
 - Anonymous usage statistics and crash reports (Firebase) are sent **only if you accept** on first launch.
-  You can change your choice at any time in *SETUP*.
+  You can change your choice at any time in *SETUP* (*RÉGLAGES* in French).
 - Collected events (only after consent): game start, level completed, boss defeated, game over, game quit, settings
   changes, with numbers and short codes only (level, score, duration, cause). High-score names stay on the phone.
 
