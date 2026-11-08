@@ -43,6 +43,13 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-27 Language core and French: i18n index (English reference), Strings type, I18nProvider, expo-localization, language setting store, French dictionary (typography, plurals), SETUP language choice, canvas texts per language, app wiring, launcher name (AC-34, AC-43, AC-45) - proof: unit
 - [x] T-28 Maestro: flows pin English through SETUP, language flow with screenshots, readme-3 capture on the level transition (AC-44) - proof: e2e
 
+### v0.2.1 bug fixes
+- [ ] T-29 Set the mixing audio mode once at startup, before the music plays, so the player's own music keeps playing (AC-42, AC-30) - proof: unit
+- [ ] T-30 Touches that start on the HUD (PAUSE) do not fire (AC-26, AC-09) - proof: unit
+- [ ] T-31 Sub-step bullet motion and hits so fast bullets cannot pass through small targets at low frame rates (AC-39, AC-14) - proof: unit
+- [ ] T-32 Guard consent and high-score writes, show "Score saved!" only after a successful save (AC-02, AC-23, AC-29) - proof: unit
+- [ ] T-33 Pause overlay above the Jah blessing, blessing animation frozen while paused (AC-26, AC-28, AC-17) - proof: unit
+
 ## Notes
 
 - Build findings: Skia 2.6 needs react-native-reanimated at runtime (added); a stale Metro cache from a build
