@@ -36,6 +36,41 @@ const overlaps = (a: { x: number; y: number; width: number; height: number }, b:
   a.y - a.height / 2 < b.y - b.height / 2 + b.height &&
   a.y - a.height / 2 + a.height > b.y - b.height / 2;
 
+type Box = { x: number; y: number; width: number; height: number };
+
+// Bullets are tested along their move of the frame, sampled at most every SWEEP_STEP px: smaller than the smallest
+// bullet + target overlap (bomb 10 px + ghost bullet 10 px), so a fast bullet at a low frame rate cannot jump over
+// a target. Returns the earliest fraction of the move, in (0, 1], at which the bullet overlaps the target, or null.
+// The start of the move was the end of the previous frame (already tested), so it is not tested again.
+export const SWEEP_STEP = 8;
+
+function sweptHit(b: Bullet, target: Box): number | null {
+  const halfW = (b.width + target.width) / 2;
+  const halfH = (b.height + target.height) / 2;
+  const dx = b.x - b.prevX;
+  const dy = b.y - b.prevY;
+  // Quick reject: the target is away from the whole move.
+  if (Math.min(b.prevX, b.x) - halfW >= target.x || Math.max(b.prevX, b.x) + halfW <= target.x) return null;
+  if (Math.min(b.prevY, b.y) - halfH >= target.y || Math.max(b.prevY, b.y) + halfH <= target.y) return null;
+  const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / SWEEP_STEP));
+  for (let i = 1; i <= n; i++) {
+    const t = i / n;
+    if (Math.abs(b.prevX + dx * t - target.x) < halfW && Math.abs(b.prevY + dy * t - target.y) < halfH) return t;
+  }
+  return null;
+}
+
+// The target of a list hit first along the bullet's move, with the fraction of the move where it is hit.
+function firstOnPath<T extends Box & { active: boolean }>(b: Bullet, targets: readonly T[], hittable: (t: T) => boolean = () => true): { target: T; t: number } | null {
+  let best: { target: T; t: number } | null = null;
+  for (const target of targets) {
+    if (!target.active || !hittable(target)) continue;
+    const t = sweptHit(b, target);
+    if (t !== null && (best === null || t < best.t)) best = { target, t };
+  }
+  return best;
+}
+
 const isHeli = (e: AirEnemy) => e.type === 'helicopter' || e.type === 'blackhawk';
 
 export class GameEngine {
@@ -437,6 +472,8 @@ export class GameEngine {
       explosionRadius,
       angle,
       ghost,
+      prevX: this.layout.playerX,
+      prevY: this.layout.playerY - 20,
     };
     this.bullets.push(bullet);
     return bullet;
@@ -466,13 +503,14 @@ export class GameEngine {
     this.emit({ type: 'shot', weapon: w.id });
   }
 
+  // Moves only: bullets leave the game in cleanup(), after the hits along their move were tested.
   private updateBullets(dt: number): void {
-    const { W, H } = this.layout;
     for (const b of this.bullets) {
       if (!b.active) continue;
+      b.prevX = b.x;
+      b.prevY = b.y;
       b.x += b.vx * dt;
       b.y += b.vy * dt;
-      if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20) b.active = false;
     }
   }
 
@@ -842,59 +880,60 @@ export class GameEngine {
     }
   }
 
+  // A bullet hits at most one target of each kind per frame (air enemy, paratrooper, power-up, bomb), in that order,
+  // each the first one along its move. A power-up orb or a bomb stops any bullet, any hit stops a non-penetrating
+  // one: targets further along the move than where the bullet stops are not hit.
   private checkCollisions(): void {
     for (const b of this.bullets) {
       if (!b.active) continue;
-      for (const e of this.airEnemies) {
-        if (!e.active || e.away || !overlaps(b, e)) continue;
+      const air = firstOnPath(b, this.airEnemies, (e) => !e.away);
+      const para = firstOnPath(b, this.paratroopers);
+      const orb = firstOnPath(b, this.powerUps);
+      const bomb = firstOnPath(b, this.bombs);
+      let stopAt = Math.min(orb?.t ?? Infinity, bomb?.t ?? Infinity);
+      if (!b.penetrating) stopAt = Math.min(stopAt, air?.t ?? Infinity, para?.t ?? Infinity);
+      const stopHere = (t: number) => {
+        b.x = b.prevX + (b.x - b.prevX) * t;
+        b.y = b.prevY + (b.y - b.prevY) * t;
+        b.active = false;
+      };
+
+      if (air && air.t <= stopAt) {
+        const e = air.target;
+        if (!b.penetrating) stopHere(air.t);
         e.hp -= b.damage;
         e.flashTimer = 0.1;
-        if (!b.penetrating) b.active = false;
         if (e.hp <= 0) {
           this.registerComboKill();
           this.killAirEnemy(e, Math.floor(e.score * this.comboMultiplier));
         }
         if (b.explosive) this.createExplosion(b.x, b.y, b.explosionRadius);
-        break;
       }
-    }
-    for (const b of this.bullets) {
-      if (!b.active) continue;
-      for (const p of this.paratroopers) {
-        if (!p.active || !overlaps(b, p)) continue;
+      if (b.active && para && para.t <= stopAt) {
+        const p = para.target;
+        if (!b.penetrating) stopHere(para.t);
         p.hp -= b.damage;
         p.flashTimer = 0.1;
-        if (!b.penetrating) b.active = false;
         if (p.hp <= 0) {
           p.active = false;
           this.addScore(p.score);
           this.kills++;
           this.emit({ type: 'kill', target: 'paratrooper', points: p.score });
         }
-        break;
       }
-    }
-    for (const b of this.bullets) {
-      if (!b.active) continue;
-      for (const orb of this.powerUps) {
-        if (!orb.active || !overlaps(b, orb)) continue;
-        orb.active = false;
-        b.active = false;
-        this.activatePowerUp(orb.powerUpId);
-        break;
+      if (b.active && orb && orb.t <= stopAt) {
+        stopHere(orb.t);
+        orb.target.active = false;
+        this.activatePowerUp(orb.target.powerUpId);
       }
-    }
-    for (const b of this.bullets) {
-      if (!b.active) continue;
-      for (const bomb of this.bombs) {
-        if (!bomb.active || !overlaps(b, bomb)) continue;
-        bomb.active = false;
-        b.active = false;
-        this.addScore(bomb.score);
+      if (b.active && bomb && bomb.t <= stopAt) {
+        const m = bomb.target;
+        stopHere(bomb.t);
+        m.active = false;
+        this.addScore(m.score);
         this.kills++;
-        this.createExplosion(bomb.x, bomb.y, 20);
-        this.emit({ type: 'kill', target: 'bomb', points: bomb.score });
-        break;
+        this.createExplosion(m.x, m.y, 20);
+        this.emit({ type: 'kill', target: 'bomb', points: m.score });
       }
     }
   }
@@ -939,7 +978,8 @@ export class GameEngine {
   }
 
   private cleanup(): void {
-    this.bullets = this.bullets.filter((b) => b.active);
+    const { W, H } = this.layout;
+    this.bullets = this.bullets.filter((b) => b.active && b.x >= -20 && b.x <= W + 20 && b.y >= -20 && b.y <= H + 20);
     this.airEnemies = this.airEnemies.filter((e) => e.active);
     this.paratroopers = this.paratroopers.filter((p) => p.active);
     this.bombs = this.bombs.filter((b) => b.active);

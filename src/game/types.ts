@@ -23,6 +23,8 @@ export interface Bullet extends Body {
   explosionRadius: number;
   angle: number;
   ghost: boolean; // fired by Duppy Conqueror
+  prevX: number; // position at the start of the frame: hits are tested along the move (no tunnelling)
+  prevY: number;
 }
 
 export interface AirEnemy extends Body {

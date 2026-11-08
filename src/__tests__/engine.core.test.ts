@@ -157,3 +157,66 @@ describe('game over (AC-21)', () => {
     expect(engine.weapon.id).toBe('pistol');
   });
 });
+
+// Phone frame rates: at 30 fps or with the 0.05 s frame clamp, a 1500 px/s laser moves 75 px per frame, more than
+// a bomb is tall. Hits are tested along the bullet's path, at most one target of each kind per frame (AC-39).
+describe('fast bullets at low frame rates (AC-39, AC-14)', () => {
+  const DT = 0.05;
+
+  // A y between two end-of-frame positions of a laser shot straight up, 37.5 px from each.
+  function betweenFrames(engine: ReturnType<typeof fixedEngine>): number {
+    const y0 = engine.layout.playerY - 20 - 1500 * 0.001;
+    return y0 - 1500 * DT * 1.5;
+  }
+
+  it('a laser aimed at a bomb hits it with dt = 0.05', () => {
+    const engine = fixedEngine();
+    engine.startLevel(18);
+    silenceWaves(engine);
+    const bomb = Object.assign(engine.createBomb(engine.layout.playerX, betweenFrames(engine)), { vy: 0 });
+    fireOneShot(engine);
+    const kills = ofType(run(engine, 0.3, DT), 'kill');
+    expect(bomb.active).toBe(false);
+    expect(kills).toEqual([{ type: 'kill', target: 'bomb', points: 300 }]);
+    expect(engine.bullets).toHaveLength(0); // a bomb stops even a laser
+  });
+
+  it('a laser crossing a helicopter in one frame hits it exactly once in that frame', () => {
+    const engine = fixedEngine();
+    engine.startLevel(18);
+    silenceWaves(engine);
+    const heli = engine.spawnEnemy('helicopter');
+    Object.assign(heli, { x: engine.layout.playerX, y: betweenFrames(engine), vx: 0, vy: 0, hp: 50 });
+    fireOneShot(engine);
+    run(engine, 0.3, DT);
+    expect(heli.hp).toBe(45);
+  });
+
+  it('a bomb on the path stops a laser before the helicopter behind it', () => {
+    const engine = fixedEngine();
+    engine.startLevel(18);
+    silenceWaves(engine);
+    const y = betweenFrames(engine);
+    Object.assign(engine.createBomb(engine.layout.playerX, y + 20), { vy: 0 });
+    const heli = engine.spawnEnemy('helicopter');
+    Object.assign(heli, { x: engine.layout.playerX, y: y - 30, vx: 0, vy: 0, hp: 50 });
+    fireOneShot(engine);
+    run(engine, 0.3, DT);
+    expect(heli.hp).toBe(50);
+  });
+
+  it('a laser hits a bomb at the top edge in the frame it leaves the screen', () => {
+    const engine = fixedEngine();
+    engine.startLevel(18);
+    silenceWaves(engine);
+    // First frame chosen so that the laser is at y = 40 after k frames, then at y = -35 (off screen) one frame later.
+    const start = engine.layout.playerY - 20;
+    const k = Math.floor((start - 40) / 75);
+    const bomb = Object.assign(engine.createBomb(engine.layout.playerX, 2.5), { vy: 0 });
+    engine.setFiring(true, UP);
+    engine.update((start - 40 - 75 * k) / 1500);
+    engine.setFiring(false);
+    run(engine, 0.5, DT);
+    expect(bomb.active).toBe(false);
+  });
+});
