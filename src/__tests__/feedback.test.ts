@@ -2,6 +2,7 @@ import { setAudioModeAsync } from 'expo-audio';
 import { Vibration } from 'react-native';
 
 import { FeedbackPolicy, VIBRATION_BOSS_DEFEATED, VIBRATION_GAME_OVER, VIBRATION_PLANT_BURNING } from '../audio/feedback';
+import { initAudioMode } from '../audio/audioMode';
 import { playFeedback, playSound } from '../audio/player';
 import { GameEvent } from '../game/types';
 
@@ -68,5 +69,17 @@ describe('sound and vibration policy (AC-30)', () => {
   it('plays game sounds on the media stream whatever the ringer mode', () => {
     playSound('explosion');
     expect(setAudioModeAsync).toHaveBeenCalledWith(expect.objectContaining({ playsInSilentMode: true }));
+  });
+});
+
+describe('audio mode (AC-42, AC-30)', () => {
+  // expo-audio asks for exclusive audio focus when a player starts with no mode set: the player's own music stopped.
+  it('mixes with the music of other apps, on the media stream, and is set only once', async () => {
+    await initAudioMode();
+    expect(setAudioModeAsync).toHaveBeenCalledWith({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' });
+    const calls = jest.mocked(setAudioModeAsync).mock.calls.length;
+    await initAudioMode();
+    playSound('explosion');
+    expect(setAudioModeAsync).toHaveBeenCalledTimes(calls);
   });
 });

@@ -1,9 +1,10 @@
 // Plays the generated sound effects (assets/sfx, made by scripts/generate-sfx.mjs) and vibrations.
 // One expo-audio player per sound, created lazily and replayed from the start; failures are ignored (no sound is
 // better than a crash).
-import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { AudioPlayer, createAudioPlayer } from 'expo-audio';
 import { Vibration as RNVibration } from 'react-native';
 
+import { initAudioMode } from './audioMode';
 import { Feedback, SoundName } from './feedback';
 
 const SOURCES: Record<SoundName, number> = {
@@ -20,7 +21,6 @@ const SOURCES: Record<SoundName, number> = {
 };
 
 const players = new Map<SoundName, AudioPlayer>();
-let modeSet = false;
 
 function player(name: SoundName): AudioPlayer {
   let p = players.get(name);
@@ -34,12 +34,7 @@ function player(name: SoundName): AudioPlayer {
 
 export function playSound(name: SoundName): void {
   try {
-    if (!modeSet) {
-      modeSet = true;
-      // Mix with the player's music instead of stopping it. Media plays whatever the ringer mode (Android convention:
-      // with false, expo-audio mutes everything when the phone is on silent or vibrate); SOUND in SETUP is the mute.
-      setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' }).catch(() => {});
-    }
+    void initAudioMode(); // normally already set at startup (App), kept as a safety net
     const p = player(name);
     p.seekTo(0).catch(() => {});
     p.play();

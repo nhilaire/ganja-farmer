@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as NativeSplash from 'expo-splash-screen';
 import { ActivityIndicator, AppState, Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 
+import { initAudioMode } from './audio/audioMode';
 import { FeedbackPolicy } from './audio/feedback';
 import { backgroundMusic } from './audio/music';
 import { playFeedback } from './audio/player';
@@ -53,11 +54,13 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   useEffect(() => {
     let alive = true;
     (async () => {
+      // The audio mode is awaited here: the music starts only once consent is known, so after the mode (AC-42).
       const [storedConsent, storedScores, storedSettings, storedLanguage] = await Promise.all([
         loadConsent(),
         loadHighScores(),
         loadSettings(),
         loadLanguageSetting(),
+        initAudioMode(),
       ]);
       if (storedConsent !== 'unknown') await applyConsent(storedConsent === 'granted');
       if (alive) {

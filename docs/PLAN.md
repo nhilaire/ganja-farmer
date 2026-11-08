@@ -44,7 +44,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-28 Maestro: flows pin English through SETUP, language flow with screenshots, readme-3 capture on the level transition (AC-44) - proof: e2e
 
 ### v0.2.1 bug fixes
-- [ ] T-29 Set the mixing audio mode once at startup, before the music plays, so the player's own music keeps playing (AC-42, AC-30) - proof: unit
+- [x] T-29 Set the mixing audio mode once at startup, before the music plays, so the player's own music keeps playing (AC-42, AC-30) - proof: unit
 - [ ] T-30 Touches that start on the HUD (PAUSE) do not fire (AC-26, AC-09) - proof: unit
 - [ ] T-31 Sub-step bullet motion and hits so fast bullets cannot pass through small targets at low frame rates (AC-39, AC-14) - proof: unit
 - [ ] T-32 Guard consent and high-score writes, show "Score saved!" only after a successful save (AC-02, AC-23, AC-29) - proof: unit
