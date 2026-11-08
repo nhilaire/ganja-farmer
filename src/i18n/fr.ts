@@ -99,6 +99,7 @@ export const fr: Strings = {
     namePlaceholder: 'Ton nom, Rasta',
     save: 'ENREGISTRER',
     saved: ex('Score enregistré'),
+    saveFailed: "Impossible d'enregistrer le score. Réessaie.",
     retry: 'REJOUER',
     menu: 'MENU',
   },

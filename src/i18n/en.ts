@@ -98,6 +98,7 @@ export const en = {
     namePlaceholder: 'Your name, Rasta',
     save: 'SAVE',
     saved: 'Score saved!',
+    saveFailed: 'Could not save the score. Try again.',
     retry: 'RETRY',
     menu: 'MENU',
   },

@@ -13,7 +13,7 @@ type Props = {
   kills: number;
   level: number;
   isHighScore: boolean;
-  onSave: (name: string) => Promise<void>;
+  onSave: (name: string) => Promise<boolean>; // true once the score is stored
   onRetry: () => void;
   onMenu: () => void;
 };
@@ -30,7 +30,9 @@ export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRet
   const { t } = useI18n();
   const [showUI, setShowUI] = useState(false);
   const [name, setName] = useState('');
-  const [saved, setSaved] = useState(false);
+  // 'saved' only after the storage confirmed the write (AC-23); 'failed' offers the name entry again.
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
+  const saved = saveState === 'saved';
 
   useEffect(() => {
     const timer = setTimeout(() => setShowUI(true), GAME_OVER_UI_DELAY_MS);
@@ -45,9 +47,15 @@ export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRet
   }, [onMenu]);
 
   const save = async () => {
-    if (saved) return;
-    setSaved(true);
-    await onSave(name);
+    if (saveState === 'saving' || saveState === 'saved') return;
+    setSaveState('saving');
+    let ok = false;
+    try {
+      ok = await onSave(name);
+    } catch {
+      ok = false;
+    }
+    setSaveState(ok ? 'saved' : 'failed');
   };
 
   return (
@@ -74,13 +82,14 @@ export function GameOverScreen({ score, kills, level, isHighScore, onSave, onRet
               autoCapitalize="characters"
               autoCorrect={false}
               returnKeyType="done"
-              onSubmitEditing={save}
+              onSubmitEditing={() => void save()}
               testID="gameover-name"
             />
-            <Action label={t.gameOver.save} onPress={save} testID="gameover-save" color={colors.rastaGreen} />
+            <Action label={t.gameOver.save} onPress={() => void save()} testID="gameover-save" color={colors.rastaGreen} />
           </View>
         </View>
       )}
+      {saveState === 'failed' && <Text style={styles.saveFailed}>{t.gameOver.saveFailed}</Text>}
       {saved && <Text style={styles.saved}>{t.gameOver.saved}</Text>}
       {showUI && (
         <View style={styles.actions}>
@@ -120,6 +129,7 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   saved: { fontSize: 16, color: '#32CD32', fontWeight: 'bold' },
+  saveFailed: { fontSize: 16, color: colors.rastaRed, fontWeight: 'bold' },
   actions: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
   button: {
     minWidth: 130,

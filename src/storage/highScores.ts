@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { HighScoreEntry, insertScore } from '../game/highScores';
+import { reportError } from '../telemetry/telemetry';
 
 const KEY = 'highScores.v1';
 
@@ -19,12 +20,23 @@ export async function loadHighScores(): Promise<HighScoreEntry[]> {
   }
 }
 
-export async function saveHighScore(entry: HighScoreEntry): Promise<HighScoreEntry[]> {
-  const updated = insertScore(await loadHighScores(), entry);
-  await AsyncStorage.setItem(KEY, JSON.stringify(updated));
-  return updated;
+// Both writes never throw: they resolve true once stored, false (reported) when the storage failed.
+export async function saveHighScore(entry: HighScoreEntry): Promise<boolean> {
+  try {
+    await AsyncStorage.setItem(KEY, JSON.stringify(insertScore(await loadHighScores(), entry)));
+    return true;
+  } catch (error) {
+    reportError(error, 'save_high_score');
+    return false;
+  }
 }
 
-export async function clearHighScores(): Promise<void> {
-  await AsyncStorage.removeItem(KEY);
+export async function clearHighScores(): Promise<boolean> {
+  try {
+    await AsyncStorage.removeItem(KEY);
+    return true;
+  } catch (error) {
+    reportError(error, 'clear_high_scores');
+    return false;
+  }
 }

@@ -25,7 +25,7 @@ import { loadLanguageSetting, saveLanguageSetting } from './storage/languageSett
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from './storage/settings';
 import { Consent, loadConsent, saveConsent } from './telemetry/consentStore';
 import { telemetryFor, trackMapped } from './telemetry/gameTelemetry';
-import { applyConsent, track } from './telemetry/telemetry';
+import { applyConsent, reportError, track } from './telemetry/telemetry';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { colors } from './ui/theme';
 
@@ -88,9 +88,14 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
 
   const decide = useCallback(async (granted: boolean) => {
     const value = granted ? 'granted' : 'denied';
-    await saveConsent(value);
-    await applyConsent(granted);
-    setConsentState(value);
+    try {
+      await saveConsent(value);
+      await applyConsent(granted);
+    } catch (error) {
+      reportError(error, 'apply_consent');
+    } finally {
+      setConsentState(value); // the player always leaves the consent screen (AC-02)
+    }
   }, []);
 
   // STATS toggle in SETUP: the "off" event is the last one sent, the "on" event the first one after consent.
@@ -140,7 +145,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   }, []);
 
   const resetScores = useCallback(async () => {
-    await clearHighScores();
+    if (!(await clearHighScores())) return;
     setScores([]);
     track('settings_change', { setting: 'reset_scores', value: 'done' });
   }, []);
@@ -153,7 +158,9 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
   const saveScore = useCallback(
     async (name: string) => {
       const entry = { name, score: result.score, level: result.level, kills: result.kills, date: new Date().toISOString() };
-      setScores(await saveHighScore(entry));
+      const saved = await saveHighScore(entry);
+      setScores(await loadHighScores());
+      return saved;
     },
     [result],
   );

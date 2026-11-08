@@ -82,7 +82,7 @@ describe('game over screen (AC-23)', () => {
   });
 
   it('shows the stats, then after 3 s the name entry and the buttons', async () => {
-    const onSave = jest.fn(() => Promise.resolve());
+    const onSave = jest.fn(() => Promise.resolve(true));
     const onRetry = jest.fn();
     const onMenu = jest.fn();
     await render(<GameOverScreen score={1500} kills={12} level={2} isHighScore onSave={onSave} onRetry={onRetry} onMenu={onMenu} />);
