@@ -265,6 +265,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
         <JahBlessing
           restored={overlay.restored}
           groundY={engine.layout.groundY}
+          paused={paused}
           onComplete={() => setOverlay({ kind: 'transition', restored: overlay.restored, bonus: overlay.bonus, quote: pickQuote() })}
         />
       )}
@@ -331,6 +332,9 @@ const styles = StyleSheet.create({
   messageBody: { color: colors.text, fontSize: 15, fontWeight: 'bold', marginTop: spacing.xs },
   pauseOverlay: {
     ...StyleSheet.absoluteFill,
+    // Above every overlay, the Jah blessing included (zIndex 100); elevation orders views on Android.
+    zIndex: 200,
+    elevation: 200,
     backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',

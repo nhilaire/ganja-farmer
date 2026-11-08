@@ -1,5 +1,6 @@
 // Jah comes down on a cloud and blesses the field between levels (about 4 s), ported from the source
-// `components/JahBlessing.tsx`. Drawn over the playfield; touches are ignored meanwhile.
+// `components/JahBlessing.tsx`. Drawn over the playfield; touches are ignored meanwhile. Frozen while the game is
+// paused (the pause menu is drawn above it).
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, StyleSheet, Text, View } from 'react-native';
 
@@ -8,9 +9,9 @@ import { useI18n } from '../i18n/I18nProvider';
 const { width, height } = Dimensions.get('screen');
 const W = Math.max(width, height);
 
-type Props = { onComplete: () => void; restored: number; groundY: number };
+type Props = { onComplete: () => void; restored: number; groundY: number; paused?: boolean };
 
-export function JahBlessing({ onComplete, restored, groundY }: Props) {
+export function JahBlessing({ onComplete, restored, groundY, paused = false }: Props) {
   const { t } = useI18n();
   const [phrase] = useState(() => t.blessing.phrases[Math.floor(Math.random() * t.blessing.phrases.length)]);
   const onCompleteRef = useRef(onComplete);
@@ -23,78 +24,59 @@ export function JahBlessing({ onComplete, restored, groundY }: Props) {
 
   const targetY = groundY - 100;
 
-  useEffect(() => {
+  // Three phases chained; the running one is kept so that PAUSE can stop it and RESUME restart it from where the
+  // values are (AC-28: nothing moves while paused; the level transition waits for the end of the blessing).
+  const phases = useRef<(() => Animated.CompositeAnimation)[]>([
     // Phase 1: Jah descends + text appears early (at 1s)
-    Animated.parallel([
-      Animated.timing(jahY, {
-        toValue: targetY,
-        duration: 1800,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(jahScale, {
-        toValue: 1,
-        duration: 1800,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.delay(1000),
-        Animated.timing(textOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start(() => {
-      // Phase 2: Blessing glow
+    () =>
       Animated.parallel([
-        Animated.timing(glowOpacity, {
-          toValue: 0.7,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowScale, {
-          toValue: 2.5,
-          duration: 800,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        // Phase 3: Hold briefly, then ascend
+        Animated.timing(jahY, { toValue: targetY, duration: 1800, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(jahScale, { toValue: 1, duration: 1800, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
         Animated.sequence([
-          Animated.delay(800),
-          Animated.parallel([
-            Animated.timing(jahY, {
-              toValue: -150,
-              duration: 800,
-              easing: Easing.in(Easing.quad),
-              useNativeDriver: true,
-            }),
-            Animated.timing(jahScale, {
-              toValue: 0.3,
-              duration: 800,
-              useNativeDriver: true,
-            }),
-            Animated.timing(glowOpacity, {
-              toValue: 0,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-            Animated.timing(textOpacity, {
-              toValue: 0,
-              duration: 500,
-              useNativeDriver: true,
-            }),
-          ]),
-        ]).start(() => {
-          onCompleteRef.current();
-        });
+          Animated.delay(1000),
+          Animated.timing(textOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+        ]),
+      ]),
+    // Phase 2: Blessing glow
+    () =>
+      Animated.parallel([
+        Animated.timing(glowOpacity, { toValue: 0.7, duration: 600, useNativeDriver: true }),
+        Animated.timing(glowScale, { toValue: 2.5, duration: 800, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      ]),
+    // Phase 3: Hold briefly, then ascend
+    () =>
+      Animated.sequence([
+        Animated.delay(800),
+        Animated.parallel([
+          Animated.timing(jahY, { toValue: -150, duration: 800, easing: Easing.in(Easing.quad), useNativeDriver: true }),
+          Animated.timing(jahScale, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+          Animated.timing(glowOpacity, { toValue: 0, duration: 600, useNativeDriver: true }),
+          Animated.timing(textOpacity, { toValue: 0, duration: 500, useNativeDriver: true }),
+        ]),
+      ]),
+  ]).current;
+  const phase = useRef(0);
+  const running = useRef<Animated.CompositeAnimation | null>(null);
+
+  useEffect(() => {
+    if (paused) return;
+    let active = true;
+    const run = () => {
+      const animation = phases[phase.current]();
+      running.current = animation;
+      animation.start(({ finished }) => {
+        if (!active || !finished) return;
+        phase.current += 1;
+        if (phase.current < phases.length) run();
+        else onCompleteRef.current();
       });
-    });
-    // Animated values and the target are fixed for the lifetime of the overlay.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    };
+    run();
+    return () => {
+      active = false;
+      running.current?.stop();
+    };
+  }, [paused, phases]);
 
   return (
     <View style={styles.overlay} pointerEvents="none" testID="jah-blessing">

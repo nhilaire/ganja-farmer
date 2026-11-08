@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { AppState } from 'react-native';
+import { AppState, StyleSheet } from 'react-native';
 
 import { GameScreen } from '../screens/GameScreen';
 import { fixedEngine } from '../test-utils/engine';
@@ -113,6 +113,30 @@ describe('GameScreen', () => {
     expect(screen.queryByTestId('level-transition')).toBeNull();
     expect(engine.level).toBe(2);
     expect(screen.getByText('Level: 02')).toBeTruthy();
+  });
+
+  // Phone report: PAUSE during the blessing showed the pause menu under Jah, and the blessing went on meanwhile.
+  it('pausing during the Jah blessing shows the menu on top and freezes the blessing (AC-26, AC-28)', async () => {
+    const { engine, onQuit, onGameOver } = setup();
+    await render(<GameScreen engine={engine} onQuit={onQuit} onGameOver={onGameOver} />);
+    for (const p of engine.plants.slice(0, 6)) p.alive = false;
+    engine.forceComplete();
+    await advance(700);
+    expect(screen.getByTestId('jah-blessing')).toBeTruthy();
+    await fireEvent.press(screen.getByTestId('game-pause'));
+    const z = (testID: string) => {
+      const style = StyleSheet.flatten(screen.getByTestId(testID).props.style);
+      return { zIndex: style.zIndex ?? 0, elevation: style.elevation ?? 0 };
+    };
+    expect(z('pause-overlay').zIndex).toBeGreaterThan(z('jah-blessing').zIndex);
+    expect(z('pause-overlay').elevation).toBeGreaterThan(z('jah-blessing').elevation);
+    await advance(10000);
+    expect(screen.getByTestId('jah-blessing')).toBeTruthy(); // frozen, not finished
+    expect(screen.queryByText('LEVEL 2')).toBeNull();
+    await fireEvent.press(screen.getByTestId('pause-resume'));
+    await advance(8000);
+    expect(screen.queryByTestId('jah-blessing')).toBeNull();
+    expect(screen.getByText('LEVEL 2')).toBeTruthy();
   });
 
   it('shows the Jah blessing then the transition with the restored plants (AC-22)', async () => {

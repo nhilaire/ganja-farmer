@@ -48,7 +48,7 @@ Format: `- [ ] T-01 Title (AC-01, AC-02) - proof: unit|e2e|device`. Check the bo
 - [x] T-30 Touches that start on the HUD (PAUSE) do not fire (AC-26, AC-09) - proof: unit
 - [x] T-31 Sub-step bullet motion and hits so fast bullets cannot pass through small targets at low frame rates (AC-39, AC-14) - proof: unit
 - [x] T-32 Guard consent and high-score writes, show "Score saved!" only after a successful save (AC-02, AC-23, AC-29) - proof: unit
-- [ ] T-33 Pause overlay above the Jah blessing, blessing animation frozen while paused (AC-26, AC-28, AC-17) - proof: unit
+- [x] T-33 Pause overlay above the Jah blessing, blessing animation frozen while paused (AC-26, AC-28, AC-17) - proof: unit
 
 ## Notes
 
