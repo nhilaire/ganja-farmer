@@ -5,7 +5,7 @@ import { AppState, BackHandler, GestureResponderEvent, Pressable, StyleSheet, Te
 import { CheatDetector } from '../game/cheats';
 import { GameEngine } from '../game/engine';
 import { PLANT_COUNT } from '../game/layout';
-import { Aim, TouchTracker } from '../game/touches';
+import { Aim, firesFrom, TouchTracker } from '../game/touches';
 import { GameEvent } from '../game/types';
 import { useI18n } from '../i18n/I18nProvider';
 import { JAH_QUOTES } from '../i18n/quotes';
@@ -28,6 +28,7 @@ type Props = {
 };
 
 const MAX_DT = 0.05; // clamp long frames (app resumed, GC pause) to keep the simulation stable
+const HUD_BORDER = 6; // the HUD bar is drawn a little taller than the layout's HUD height
 
 // Fingers that changed in this event; tests and some platforms only give the top-level touch.
 function changed(e: GestureResponderEvent): { identifier: number; pageX: number; pageY: number }[] {
@@ -49,6 +50,9 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
   const [bossWarning, setBossWarning] = useState<string | null>(null);
   const cheats = useMemo(() => new CheatDetector(engine.layout), [engine]);
   const fingers = useMemo(() => new TouchTracker(), []);
+  // Touches that started on a HUD control (PAUSE): the HUD sees them first, then they bubble to the screen.
+  const hudTouches = useRef(new Set<number>());
+  const hudBottom = engine.layout.hudHeight + HUD_BORDER;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const onEventsRef = useRef(onEvents);
   onEventsRef.current = onEvents;
@@ -164,15 +168,21 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
   const onTouchStart = useCallback(
     (e: GestureResponderEvent) => {
-      if (!interactive) return;
-      for (const t of changed(e)) {
+      const touches = changed(e);
+      if (!interactive) {
+        hudTouches.current.clear();
+        return;
+      }
+      for (const t of touches) {
+        const startedOnHud = hudTouches.current.delete(t.identifier);
         const cheat = cheats.tap(t.pageX, t.pageY, Date.now());
         if (cheat === 'skipLevel') engine.forceComplete();
         else if (cheat === 'restorePlants') engine.restorePlants(2);
-        applyAim(fingers.down(t.identifier, t.pageX, t.pageY));
+        // A touch on the HUD (PAUSE) neither aims nor fires (AC-26).
+        if (firesFrom({ pageY: t.pageY, startedOnHud }, hudBottom)) applyAim(fingers.down(t.identifier, t.pageX, t.pageY));
       }
     },
-    [interactive, cheats, engine, fingers, applyAim],
+    [interactive, cheats, engine, fingers, applyAim, hudBottom],
   );
 
   const onTouchMove = useCallback(
@@ -192,6 +202,10 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
 
   const onTouchCancel = useCallback(() => applyAim(fingers.clear()), [fingers, applyAim]);
 
+  const onHudTouchStart = useCallback((e: GestureResponderEvent) => {
+    for (const t of changed(e)) hudTouches.current.add(t.identifier);
+  }, []);
+
   const picture = createPicture((canvas) => drawScene(canvas, engine, { bossWarning }, t));
 
   return (
@@ -207,7 +221,7 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
         <Picture picture={picture} />
       </Canvas>
 
-      <View style={[styles.hud, { height: engine.layout.hudHeight + 6 }]} pointerEvents="box-none">
+      <View style={[styles.hud, { height: hudBottom }]} pointerEvents="box-none" onTouchStart={onHudTouchStart}>
         <Text style={styles.hudText} testID="hud-score">
           {t.hud.score(engine.score)}
         </Text>

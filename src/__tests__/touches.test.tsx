@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
-import { TouchTracker } from '../game/touches';
+import { firesFrom, TouchTracker } from '../game/touches';
 import { GameScreen } from '../screens/GameScreen';
 import { fixedEngine } from '../test-utils/engine';
 
@@ -53,6 +53,50 @@ describe('game screen with two fingers (AC-40)', () => {
     const { playerX, playerY } = engine.layout;
     expect(engine.aimAngle).toBeCloseTo(Math.atan2(120 - playerY, 700 - playerX));
     await fireEvent(field, 'touchEnd', { nativeEvent: { ...b, changedTouches: [b], touches: [] } });
+    expect(engine.firing).toBe(false);
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+  });
+});
+
+describe('touches on the HUD (AC-26, AC-09)', () => {
+  it('fires only from touches that start below the HUD bar and not on a HUD control', () => {
+    expect(firesFrom({ pageY: 100, startedOnHud: false }, 30)).toBe(true);
+    expect(firesFrom({ pageY: 30, startedOnHud: false }, 30)).toBe(true);
+    expect(firesFrom({ pageY: 29, startedOnHud: false }, 30)).toBe(false); // on the HUD bar
+    expect(firesFrom({ pageY: 40, startedOnHud: true }, 30)).toBe(false); // PAUSE hit slop below the bar
+  });
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  it('does not fire when the touch starts on the HUD, but the corner cheat still counts it', async () => {
+    const engine = fixedEngine();
+    engine.waves.update = () => false;
+    await render(<GameScreen engine={engine} onQuit={jest.fn()} onGameOver={jest.fn()} />);
+    const field = screen.getByTestId('game-screen');
+    const hudY = engine.layout.hudHeight / 2;
+    for (let i = 0; i < 3; i++) {
+      await fireEvent(field, 'touchStart', { nativeEvent: { identifier: 1, pageX: 10, pageY: hudY } });
+      expect(engine.firing).toBe(false);
+      await fireEvent(field, 'touchEnd', { nativeEvent: { identifier: 1, pageX: 10, pageY: hudY } });
+    }
+    expect(engine.phase).not.toBe('playing'); // skip-level cheat: level complete
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+  });
+
+  it('does not fire while PAUSE is pressed', async () => {
+    const engine = fixedEngine();
+    engine.waves.update = () => false;
+    await render(<GameScreen engine={engine} onQuit={jest.fn()} onGameOver={jest.fn()} />);
+    const pauseButton = screen.getByTestId('game-pause');
+    // Real touches bubble from PAUSE to the HUD and then to the screen; the test renderer stops at the first handler.
+    await fireEvent(pauseButton, 'touchStart', { nativeEvent: { identifier: 3, pageX: 780, pageY: 40 } });
+    await fireEvent(screen.getByTestId('game-screen'), 'touchStart', { nativeEvent: { identifier: 3, pageX: 780, pageY: 40 } });
     expect(engine.firing).toBe(false);
     await act(async () => {
       jest.advanceTimersByTime(100);

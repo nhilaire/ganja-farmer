@@ -39,3 +39,11 @@ export class TouchTracker {
     return last ? { firing: true, aim: { ...last } } : { firing: false, aim: null };
   }
 }
+
+/**
+ * Whether a new touch aims and fires: only when it starts on the playfield, below the HUD bar, and not on a HUD
+ * control such as PAUSE (whose hit slop reaches below the bar). HUD touches still count for the corner cheats.
+ */
+export function firesFrom(touch: { pageY: number; startedOnHud: boolean }, hudBottom: number): boolean {
+  return !touch.startedOnHud && touch.pageY >= hudBottom;
+}
