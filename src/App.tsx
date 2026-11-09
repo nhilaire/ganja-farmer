@@ -118,7 +118,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number }) {
 
   const quit = useCallback(() => {
     track('game_quit', { level: engine.level, duration_s: Math.round(engine.playTime) });
-    engine.paused = false;
+    engine.resume();
     setRoute('home');
   }, [engine]);
 

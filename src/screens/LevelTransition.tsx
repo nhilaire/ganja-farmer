@@ -1,7 +1,7 @@
 // Between levels: next level number, Jah quote, bonus, restored plants, new weapon, "Tap to continue".
 // Ported from the source `components/LevelTransition.tsx`; taps count only after the 500 ms fade-in.
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, useAnimatedValue, View } from 'react-native';
 
 import { PLANT_COUNT } from '../game/layout';
 import { weaponForLevel } from '../game/weapons';
@@ -19,7 +19,7 @@ type Props = {
 
 export function LevelTransition({ nextLevel, bonus, restored, alive, quote, onContinue }: Props) {
   const { t } = useI18n();
-  const fade = useRef(new Animated.Value(0)).current;
+  const fade = useAnimatedValue(0);
   const [ready, setReady] = useState(false);
   const leaving = useRef(false);
   const weapon = weaponForLevel(nextLevel);

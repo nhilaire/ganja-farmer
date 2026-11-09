@@ -1,5 +1,5 @@
 import { Canvas, createPicture, Picture } from '@shopify/react-native-skia';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { AppState, BackHandler, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CheatDetector } from '../game/cheats';
@@ -54,10 +54,6 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
   const hudTouches = useRef(new Set<number>());
   const hudBottom = engine.layout.hudHeight + HUD_BORDER;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const onEventsRef = useRef(onEvents);
-  onEventsRef.current = onEvents;
-  const onGameOverRef = useRef(onGameOver);
-  onGameOverRef.current = onGameOver;
 
   setRenderLayout(engine.layout);
 
@@ -73,39 +69,38 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
     [later],
   );
 
-  const handleEvents = useCallback(
-    (events: GameEvent[]) => {
-      if (events.length === 0) return;
-      onEventsRef.current?.(events);
-      for (const e of events) {
-        switch (e.type) {
-          case 'powerUpActivated':
-            showMessage(t.powerUps[e.id].name, t.powerUps[e.id].description);
-            break;
-          case 'bossSpawn':
-            setBossWarning(e.name);
-            later(3000, () => setBossWarning(null));
-            break;
-          case 'levelStart':
-            if (e.level === 10) showMessage(t.game.rocketMessage, undefined, 3000);
-            break;
-          case 'levelComplete':
-            setOverlay(
-              e.restored > 0
-                ? { kind: 'blessing', restored: e.restored, bonus: e.bonus }
-                : { kind: 'transition', restored: 0, bonus: e.bonus, quote: pickQuote() },
-            );
-            break;
-          case 'gameOver':
-            onGameOverRef.current();
-            break;
-        }
+  // Called from the game loop only; always sees the latest callbacks and strings without restarting the loop.
+  const handleEvents = useEffectEvent((events: GameEvent[]) => {
+    if (events.length === 0) return;
+    onEvents?.(events);
+    for (const e of events) {
+      switch (e.type) {
+        case 'powerUpActivated':
+          showMessage(t.powerUps[e.id].name, t.powerUps[e.id].description);
+          break;
+        case 'bossSpawn':
+          setBossWarning(e.name);
+          later(3000, () => setBossWarning(null));
+          break;
+        case 'levelStart':
+          if (e.level === 10) showMessage(t.game.rocketMessage, undefined, 3000);
+          break;
+        case 'levelComplete':
+          setOverlay(
+            e.restored > 0
+              ? { kind: 'blessing', restored: e.restored, bonus: e.bonus }
+              : { kind: 'transition', restored: 0, bonus: e.bonus, quote: pickQuote() },
+          );
+          break;
+        case 'gameOver':
+          onGameOver();
+          break;
       }
-    },
-    [later, showMessage],
-  );
+    }
+  });
 
-  // Game loop: one engine step and one render per animation frame.
+  // Game loop: one engine step and one render per animation frame. The first frame has dt = 0 (no simulation) and
+  // delivers the events already queued by the engine (levelStart of the first level).
   useEffect(() => {
     let raf = 0;
     let last: number | null = null;
@@ -117,24 +112,23 @@ export function GameScreen({ engine, onEvents, onGameOver, onQuit }: Props) {
       setFrame((f) => (f + 1) % 1_000_000);
       raf = requestAnimationFrame(step);
     };
-    handleEvents(engine.drainEvents()); // levelStart of the first level
     raf = requestAnimationFrame(step);
     const pending = timers.current;
     return () => {
       cancelAnimationFrame(raf);
       pending.forEach(clearTimeout);
     };
-  }, [engine, handleEvents]);
+  }, [engine]);
 
   const pause = useCallback(() => {
-    engine.paused = true;
+    engine.pause();
     fingers.clear();
     engine.setFiring(false);
     setPaused(true);
   }, [engine, fingers]);
 
   const resume = useCallback(() => {
-    engine.paused = false;
+    engine.resume();
     setPaused(false);
   }, [engine]);
 

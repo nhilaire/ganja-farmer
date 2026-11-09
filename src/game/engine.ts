@@ -30,12 +30,6 @@ export const PLANE_RETURN_MIN = 5;
 export const PLANE_RETURN_MAX = 10;
 export const PLANE_RETURN_AFTER_QUOTA = 2;
 
-const overlaps = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }) =>
-  a.x - a.width / 2 < b.x - b.width / 2 + b.width &&
-  a.x - a.width / 2 + a.width > b.x - b.width / 2 &&
-  a.y - a.height / 2 < b.y - b.height / 2 + b.height &&
-  a.y - a.height / 2 + a.height > b.y - b.height / 2;
-
 type Box = { x: number; y: number; width: number; height: number };
 
 // Bullets are tested along their move of the frame, sampled at most every SWEEP_STEP px: smaller than the smallest
@@ -253,6 +247,15 @@ export class GameEngine {
   }
 
   // ---------- Main loop ----------
+
+  // PAUSE / RESUME (AC-28): a paused engine ignores update(), so nothing moves and no timer runs meanwhile.
+  pause(): void {
+    this.paused = true;
+  }
+
+  resume(): void {
+    this.paused = false;
+  }
 
   update(dt: number): void {
     if (this.paused || this.phase === 'levelComplete' || this.phase === 'over' || dt <= 0) return;

@@ -2,7 +2,7 @@
 // `components/JahBlessing.tsx`. Drawn over the playfield; touches are ignored meanwhile. Frozen while the game is
 // paused (the pause menu is drawn above it).
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Easing, StyleSheet, Text, useAnimatedValue, View } from 'react-native';
 
 import { useI18n } from '../i18n/I18nProvider';
 
@@ -14,19 +14,23 @@ type Props = { onComplete: () => void; restored: number; groundY: number; paused
 export function JahBlessing({ onComplete, restored, groundY, paused = false }: Props) {
   const { t } = useI18n();
   const [phrase] = useState(() => t.blessing.phrases[Math.floor(Math.random() * t.blessing.phrases.length)]);
+  // Latest onComplete, read only from the animation callback (asynchronous).
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
-  const jahY = useRef(new Animated.Value(-100)).current;
-  const jahScale = useRef(new Animated.Value(0.3)).current;
-  const glowOpacity = useRef(new Animated.Value(0)).current;
-  const glowScale = useRef(new Animated.Value(0.5)).current;
-  const textOpacity = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
+  const jahY = useAnimatedValue(-100);
+  const jahScale = useAnimatedValue(0.3);
+  const glowOpacity = useAnimatedValue(0);
+  const glowScale = useAnimatedValue(0.5);
+  const textOpacity = useAnimatedValue(0);
 
   const targetY = groundY - 100;
 
-  // Three phases chained; the running one is kept so that PAUSE can stop it and RESUME restart it from where the
-  // values are (AC-28: nothing moves while paused; the level transition waits for the end of the blessing).
-  const phases = useRef<(() => Animated.CompositeAnimation)[]>([
+  // Three phases chained, built once per mount; the running one is kept so that PAUSE can stop it and RESUME
+  // restart it from where the values are (AC-28: nothing moves while paused; the level transition waits for the
+  // end of the blessing).
+  const [phases] = useState<(() => Animated.CompositeAnimation)[]>(() => [
     // Phase 1: Jah descends + text appears early (at 1s)
     () =>
       Animated.parallel([
@@ -54,7 +58,7 @@ export function JahBlessing({ onComplete, restored, groundY, paused = false }: P
           Animated.timing(textOpacity, { toValue: 0, duration: 500, useNativeDriver: true }),
         ]),
       ]),
-  ]).current;
+  ]);
   const phase = useRef(0);
   const running = useRef<Animated.CompositeAnimation | null>(null);
 

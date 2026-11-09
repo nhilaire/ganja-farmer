@@ -102,6 +102,19 @@ describe('pause (AC-28)', () => {
     run(engine, 0.5);
     expect(engine.playTime).toBeCloseTo(5.5, 1);
   });
+
+  it('pause() freezes the game and resume() lets it run again', () => {
+    const engine = makeEngine(seededRng(9));
+    run(engine, 1);
+    engine.pause();
+    expect(engine.paused).toBe(true);
+    run(engine, 3);
+    expect(engine.playTime).toBeCloseTo(1, 5);
+    engine.resume();
+    expect(engine.paused).toBe(false);
+    run(engine, 0.5);
+    expect(engine.playTime).toBeCloseTo(1.5, 5);
+  });
 });
 
 describe('cheats (AC-31)', () => {

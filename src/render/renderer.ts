@@ -140,7 +140,6 @@ export function drawPlant(canvas: SkCanvas, plant: Plant) {
   if (!plant.alive && !plant.burning) return;
 
   const { x, y } = plant;
-  const alpha = plant.burning ? 1 - plant.burnProgress * 0.5 : 1;
 
   // Stem
   canvas.drawRect(Skia.XYWHRect(x - 1, y - 20, 2, 22), paints.plantGreen);

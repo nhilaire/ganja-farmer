@@ -40,6 +40,7 @@ export class BackgroundMusic {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- virtual module resolved by metro.config.js (asset or null), no type declaration
 const LOCAL_MUSIC: number | null = require('ganja-farmer-local-music');
 
 export const backgroundMusic = new BackgroundMusic(LOCAL_MUSIC === null ? null : () => createAudioPlayer(LOCAL_MUSIC));
